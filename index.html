@@ -13,8 +13,8 @@
     <meta property="og:title" content="Наталья Баландина — Психолог">
     <meta property="og:description" content="Пространство, где вас слышат и понимают. Помогаю справиться с тревогой и выстроить гармоничные отношения.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://vash-login.github.io/"> 
-    <link rel="canonical" href="https://vash-login.github.io/">
+    <meta property="og:url" content="https://balandinatherapy.ru/"> 
+    <link rel="canonical" href="https://balandinatherapy.ru/">
 
     <script type="text/javascript" >
        (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
@@ -24,7 +24,7 @@
        (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
 
        /* ВАЖНО: Замените 00000000 на ваш номер счетчика Яндекса */
-       ym(00000000, "init", {
+       ym(105466132, "init", {
             clickmap:true,
             trackLinks:true,
             accurateTrackBounce:true,
@@ -325,7 +325,7 @@
                             <div class="hero__stat-label">лет стажа</div>
                         </div>
                         <div>
-                            <div class="hero__stat-number">1 000+</div>
+                            <div class="hero__stat-number"> 500+</div>
                             <div class="hero__stat-label">консультаций</div>
                         </div>
                         <div>
@@ -749,7 +749,8 @@
                         </div>
                     </div>
                     <div class="contact__form reveal">
-                        <form id="contactForm" onsubmit="handleSubmit(event)">
+                        <!-- ВАЖНО: Добавлены id и onsubmit вот в эту строку -->
+                        <form id="contactForm" action="https://formspree.io/f/mlgzbvoa" method="POST" onsubmit="handleSubmit(event)">
                             <div class="form__group">
                                 <label class="form__label" for="name">Ваше имя</label>
                                 <input type="text" id="name" name="Имя" class="form__input" placeholder="Как к вам обращаться" required>
@@ -886,19 +887,53 @@
 
         revealElements.forEach(el => revealObserver.observe(el));
 
-        // Form handler
-        function handleSubmit(e) {
-            e.preventDefault();
-            const btn = e.target.querySelector('button[type="submit"]');
+        // Form handler (AJAX отправка через Formspree)
+        async function handleSubmit(e) {
+            e.preventDefault(); // Останавливаем стандартную перезагрузку страницы
+            
+            const form = e.target;
+            const btn = form.querySelector('button[type="submit"]');
             const originalText = btn.textContent;
             
-            btn.textContent = 'Отправлено ✓';
-            btn.style.background = '#5C6B52';
+            // Меняем вид кнопки на процесс отправки
+            btn.textContent = 'Отправка...';
+            btn.style.opacity = '0.7';
+            btn.style.pointerEvents = 'none'; // Защита от двойного клика
             
+            try {
+                // Отправляем данные формы в Formspree в фоновом режиме
+                const response = await fetch(form.action, {
+                    method: form.method,
+                    body: new FormData(form),
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    // Если отправка успешна
+                    btn.textContent = 'Отправлено ✓';
+                    btn.style.background = '#5C6B52';
+                    btn.style.opacity = '1';
+                    form.reset(); // Очищаем поля формы
+                } else {
+                    // Если ошибка со стороны Formspree
+                    btn.textContent = 'Ошибка отправки';
+                    btn.style.background = '#d9534f';
+                    btn.style.opacity = '1';
+                }
+            } catch (error) {
+                // Если нет интернета или другая сетевая ошибка
+                btn.textContent = 'Ошибка сети';
+                btn.style.background = '#d9534f';
+                btn.style.opacity = '1';
+            }
+            
+            // Возвращаем кнопку в исходное состояние через 3 секунды
             setTimeout(() => {
                 btn.textContent = originalText;
                 btn.style.background = '';
-                e.target.reset();
+                btn.style.pointerEvents = 'all';
             }, 3000);
         }
 
