@@ -3,21 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+
     <title>{{TITLE}} | Наталья Баландина</title>
     <meta name="description" content="{{META_DESC}}">
     <meta name="robots" content="index, follow">
-    
+
     <meta property="og:title" content="{{TITLE}} | Наталья Баландина">
     <meta property="og:description" content="{{META_DESC}}">
     <meta property="og:type" content="article">
-    
+
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23FAF8F5%22/><text x=%2250%22 y=%2270%22 font-size=%2265%22 font-family=%22Georgia, serif%22 text-anchor=%22middle%22 fill=%22%237A8B6F%22>Н</text></svg>">
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23FAF8F5%22/><text x=%2250%22 y=%2270%22 font-size=%2265%22 font-family=%22Georgia, serif%22 text-anchor=%22middle%22 fill=%22%237A8B6F%22>Н</text></svg>">
 
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    
+
     <style>
         /* Специфичные стили только для страницы чтения статьи */
         .article-page {
@@ -39,6 +39,16 @@
         }
         .article-back:hover {
             color: var(--color-accent);
+        }
+        .article-hero-image {
+            width: 100%;
+            height: 380px;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: var(--color-bg-alt);
+            border-radius: 12px;
+            margin-bottom: 2.5rem;
         }
         .article-meta {
             font-size: 0.85rem;
@@ -66,6 +76,8 @@
             height: auto;
             border-radius: 8px;
             margin: 2rem 0;
+            display: block;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
         }
         .article-content a {
             color: var(--color-accent);
@@ -114,14 +126,16 @@
 
     <main class="article-page">
         <a href="blog.html" class="article-back">← Вернуться к статьям</a>
-        
+
+        <div class="article-hero-image" style="background-image: url('{{IMAGE}}')"></div>
+
         <span class="article-meta">{{DATE}}</span>
         <h1 class="article-title">{{TITLE}}</h1>
-        
+
         <div class="article-content">
             {{CONTENT}}
         </div>
-        
+
         <div style="margin-top: 4rem; padding: 2rem; background: var(--color-bg-alt); border-radius: 12px; text-align: center;">
             <h3 style="font-family: var(--font-heading); font-size: 1.5rem; margin-bottom: 1rem;">Откликнулась тема?</h3>
             <p style="color: var(--color-text-light); margin-bottom: 1.5rem; font-size: 0.95rem;">Вы можете обсудить вашу ситуацию на индивидуальной онлайн-консультации.</p>
