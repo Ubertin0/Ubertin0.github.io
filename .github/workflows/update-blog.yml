@@ -1,0 +1,32 @@
+name: Auto Update Blog from Telegram
+
+on:
+  schedule:
+    - cron: '0 2 * * *' # Запуск каждый день в 02:00 ночи (по UTC)
+  workflow_dispatch: # Добавляет кнопку для ручного запуска в интерфейсе GitHub
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run parser
+        run: python build_blog.py
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "GitHub Action Bot"
+          git config --global user.email "action@github.com"
+          git add .
+          git commit -m "Auto-update blog with latest Telegram posts" || exit 0
+          git push
