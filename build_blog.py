@@ -1,24 +1,23 @@
 import os
-import re
 import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
 
 # --- Конфигурация ---
-CHANNEL_URL = "https://t.me/s/balandinatherapy" # Публичная ссылка на канал
+CHANNEL_URL = "https://t.me/s/balandinatherapy"
 TEMPLATE_FILE = "article-template.html"
 BLOG_FILE = "blog.html"
-MAX_POSTS = 15  # Сколько последних постов проверяем за один раз
+MAX_POSTS = 15
 # --------------------
 
 def main() -> None:
     print("Запуск парсера Telegram-канала...")
     
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
     try:
-        response = requests.get(CHANNEL_URL, headers=headers, timeout=10)
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
+        response = requests.get(CHANNEL_URL, headers=headers, timeout=15)
         response.raise_for_status()
-    except requests.RequestException as e:
+    except Exception as e:
         print(f"Ошибка сети: {e}")
         return
 
@@ -37,24 +36,26 @@ def main() -> None:
     for msg in messages:
         text_div = msg.find('div', class_='tgme_widget_message_text')
         if not text_div:
-            continue # Пропускаем посты без текста (например, просто фото)
+            continue
+            
+        # БРОНЯ: Удаляем все системные иконки, видео, картинки и кастомные эмодзи Телеграма
+        for media in text_div.find_all(['img', 'video', 'svg', 'i']):
+            media.decompose()
             
         time_tag = msg.find('time')
         post_date = time_tag.text if time_tag else datetime.now().strftime("%d.%m.%Y")
         
-        # Берем ID поста для красивой ссылки (например: post-142.html)
         post_link = msg.find('a', class_='tgme_widget_message_date')
         post_id = post_link['href'].split('/')[-1] if post_link else str(hash(text_div.text))
         
-        content_html = str(text_div)
+        # Лимитируем длину HTML на всякий случай
+        content_html = str(text_div)[:50000]
         raw_text = text_div.get_text(separator=' ')
         
-        # Автоматически генерируем заголовок (первое предложение) и описание для SEO
         sentences = raw_text.split('.')
-        title = sentences[0][:70] + ("..." if len(sentences[0]) > 70 else "")
-        excerpt = raw_text[:140] + ("..." if len(raw_text) > 140 else "")
+        title = sentences[0][:70].strip() + ("..." if len(sentences[0]) > 70 else "")
+        excerpt = raw_text[:140].strip() + ("..." if len(raw_text) > 140 else "")
         
-        # Подставляем данные в шаблон
         article_html = template.replace('{{TITLE}}', title)\
                                .replace('{{DATE}}', post_date)\
                                .replace('{{META_DESC}}', excerpt)\
@@ -62,11 +63,9 @@ def main() -> None:
                                
         article_filename = f"post-{post_id}.html"
         
-        # Сохраняем готовую статью
         with open(article_filename, 'w', encoding='utf-8') as f:
             f.write(article_html)
             
-        # Готовим карточку для главной страницы блога
         cards_html += f'''
             <a href="{article_filename}" class="article-card">
                 <div class="article-card__content">
@@ -77,19 +76,29 @@ def main() -> None:
                 </div>
             </a>'''
 
-    # Вставляем карточки в blog.html
+    # Безопасная замена без использования regex
     with open(BLOG_FILE, 'r', encoding='utf-8') as f:
         blog_content = f.read()
         
-    pattern = re.compile(r'.*?', re.DOTALL)
-    replacement = f'\n{cards_html}\n            '
+    start_marker = ""
+    end_marker = ""
     
-    updated_blog = pattern.sub(replacement, blog_content)
-    
-    with open(BLOG_FILE, 'w', encoding='utf-8') as f:
-        f.write(updated_blog)
+    if start_marker in blog_content and end_marker in blog_content:
+        parts1 = blog_content.split(start_marker, 1)
+        parts2 = parts1[1].split(end_marker, 1)
         
-    print("Успех: Статьи сгенерированы, блог обновлен!")
+        updated_blog = parts1[0] + start_marker + "\n" + cards_html + "\n            " + end_marker + parts2[1]
+        
+        # Предохранитель от раздувания файла
+        if len(updated_blog) > 5000000:
+            print("КРИТИЧЕСКАЯ ОШИБКА: Файл blog.html превысил 5МБ. Отмена записи.")
+            return
+            
+        with open(BLOG_FILE, 'w', encoding='utf-8') as f:
+            f.write(updated_blog)
+        print("Успех: Статьи сгенерированы, блог обновлен!")
+    else:
+        print("Ошибка: Метки для вставки карточек не найдены в blog.html!")
 
 if __name__ == "__main__":
     main()
