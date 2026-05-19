@@ -24,6 +24,10 @@ def main() -> None:
     soup = BeautifulSoup(response.text, 'html.parser')
     messages = soup.find_all('div', class_='tgme_widget_message_wrap', limit=MAX_POSTS)
 
+    if not messages:
+        print("Внимание: В Telegram-канале не найдено сообщений. Блог не будет обновлён.")
+        return
+
     if not os.path.exists(TEMPLATE_FILE) or not os.path.exists(BLOG_FILE):
         print("Ошибка: Не найден article-template.html или blog.html!")
         return
@@ -76,28 +80,43 @@ def main() -> None:
                 </div>
             </a>'''
 
+    if not cards_html.strip():
+        print("Внимание: Не удалось сгенерировать ни одной карточки. Возможно, все сообщения без текста.")
+        return
+
     # Безопасная замена без использования regex
     with open(BLOG_FILE, 'r', encoding='utf-8') as f:
         blog_content = f.read()
-        start_marker = "<!-- START ARTICLES -->"
-        end_marker = "<!-- END ARTICLES -->"
     
-    if start_marker in blog_content and end_marker in blog_content:
-        parts1 = blog_content.split(start_marker, 1)
-        parts2 = parts1[1].split(end_marker, 1)
+    start_marker = "<!-- START ARTICLES -->"
+    end_marker = "<!-- END ARTICLES -->"
+    
+    if start_marker not in blog_content or end_marker not in blog_content:
+        print(f"Ошибка: Метки {start_marker} / {end_marker} не найдены в blog.html!")
+        print("Диагностика: убедитесь, что маркеры добавлены внутрь <section class='blog-grid'>")
+        return
+
+    parts1 = blog_content.split(start_marker, 1)
+    parts2 = parts1[1].split(end_marker, 1)
+    
+    # Чистая вставка с сохранением отступов
+    updated_blog = (
+        parts1[0] 
+        + start_marker + "\n" 
+        + cards_html + "\n            " 
+        + end_marker 
+        + parts2[1]
+    )
+    
+    # Предохранитель от раздувания файла
+    if len(updated_blog) > 5000000:
+        print("КРИТИЧЕСКАЯ ОШИБКА: Файл blog.html превысил 5МБ. Отмена записи.")
+        return
         
-        updated_blog = parts1[0] + start_marker + "\n" + cards_html + "\n            " + end_marker + parts2[1]
-        
-        # Предохранитель от раздувания файла
-        if len(updated_blog) > 5000000:
-            print("КРИТИЧЕСКАЯ ОШИБКА: Файл blog.html превысил 5МБ. Отмена записи.")
-            return
-            
-        with open(BLOG_FILE, 'w', encoding='utf-8') as f:
-            f.write(updated_blog)
-        print("Успех: Статьи сгенерированы, блог обновлен!")
-    else:
-        print("Ошибка: Метки для вставки карточек не найдены в blog.html!")
+    with open(BLOG_FILE, 'w', encoding='utf-8') as f:
+        f.write(updated_blog)
+    
+    print(f"Успех: Сгенерировано {len(messages)} статей, блог обновлён!")
 
 if __name__ == "__main__":
     main()
