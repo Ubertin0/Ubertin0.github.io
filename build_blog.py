@@ -79,9 +79,8 @@ def main() -> None:
     # Безопасная замена без использования regex
     with open(BLOG_FILE, 'r', encoding='utf-8') as f:
         blog_content = f.read()
-        
-       start_marker = "<!-- START ARTICLES -->"
-       end_marker = "<!-- END ARTICLES -->"
+        start_marker = "<!-- START ARTICLES -->"
+        end_marker = "<!-- END ARTICLES -->"
     
     if start_marker in blog_content and end_marker in blog_content:
         parts1 = blog_content.split(start_marker, 1)
