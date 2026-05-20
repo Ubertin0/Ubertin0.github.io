@@ -206,6 +206,11 @@
             mobileMenu.classList.remove('active');
             document.body.style.overflow = '';
         }
+
+        // Lazy loading для всех изображений в статье
+        document.querySelectorAll('.article-content img').forEach(img => {
+            img.loading = 'lazy';
+        });
     </script>
 </body>
 </html>
