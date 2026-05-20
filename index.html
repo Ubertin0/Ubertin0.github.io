@@ -60,6 +60,8 @@
       gtag('config', 'G-YJT4GWX0QE');
     </script>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -126,7 +128,7 @@
                 </div>
                 <div class="hero__photo">
                     <div class="hero__photo-frame">
-                        <img src="photo.jpg" alt="Наталья Баландина — Психолог" class="hero__photo-img">
+                        <img src="photo.jpg" alt="Наталья Баландина — Психолог" class="hero__photo-img" width="380" height="480">
                     </div>
                 </div>
             </div>
@@ -137,7 +139,7 @@
                 <div class="about__grid">
                     <div class="about__image reveal">
                         <div class="about__image-main">
-                            <img src="photo.jpg" alt="Наталья Баландина в кабинете" class="about__photo-img">
+                            <img src="photo.jpg" alt="Наталья Баландина в кабинете" class="about__photo-img" loading="lazy" width="400" height="500">
                         </div>
                         <div class="about__image-accent">
                             19
@@ -507,11 +509,11 @@
                         <form id="contactForm" action="https://formspree.io/f/mlgzbvoa" method="POST" onsubmit="handleSubmit(event)">
                             <div class="form__group">
                                 <label class="form__label" for="name">Ваше имя</label>
-                                <input type="text" id="name" name="Имя" class="form__input" placeholder="Как к вам обращаться" required>
+                                <input type="text" id="name" name="Имя" class="form__input" placeholder="Как к вам обращаться" required autocomplete="name">
                             </div>
                             <div class="form__group">
                                 <label class="form__label" for="contact">Телефон или email</label>
-                                <input type="text" id="contact" name="Контакты" class="form__input" placeholder="+7 (___) ___-__-__ или email" required>
+                                <input type="text" id="contact" name="Контакты" class="form__input" placeholder="+7 (___) ___-__-__ или email" required autocomplete="email">
                             </div>
                             <div class="form__group">
                                 <label class="form__label" for="message">Ваш запрос</label>
