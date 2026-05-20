@@ -7,19 +7,54 @@
     <title>{{TITLE}} | Наталья Баландина</title>
     <meta name="description" content="{{META_DESC}}">
     <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://balandinatherapy.ru/post-{{POST_ID}}.html">
 
     <meta property="og:title" content="{{TITLE}} | Наталья Баландина">
     <meta property="og:description" content="{{META_DESC}}">
     <meta property="og:type" content="article">
+    <meta property="og:url" content="https://balandinatherapy.ru/post-{{POST_ID}}.html">
+    <meta property="og:image" content="{{IMAGE}}">
+    <meta property="article:published_time" content="{{DATE_ISO}}">
+    <meta property="article:author" content="Наталья Баландина">
 
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23FAF8F5%22/><text x=%2250%22 y=%2270%22 font-size=%2265%22 font-family=%22Georgia, serif%22 text-anchor=%22middle%22 fill=%22%237A8B6F%22>Н</text></svg>">
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23FAF8F5%22/><text x=%2250%22 y=%2270%22 font-size=%2265%22 font-family=%22Georgia, serif%22 text-anchor=%22middle%22 fill=%22%237A8B6F%22>Н</text></svg>">
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "{{TITLE}}",
+      "description": "{{META_DESC}}",
+      "image": "{{IMAGE}}",
+      "datePublished": "{{DATE_ISO}}",
+      "dateModified": "{{DATE_ISO}}",
+      "author": {
+        "@type": "Person",
+        "name": "Наталья Баландина",
+        "url": "https://balandinatherapy.ru/"
+      },
+      "publisher": {
+        "@type": "Person",
+        "name": "Наталья Баландина",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://balandinatherapy.ru/favicon.ico"
+        }
+      },
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "https://balandinatherapy.ru/post-{{POST_ID}}.html"
+      }
+    }
+    </script>
+
     <style>
-        /* Специфичные стили только для страницы чтения статьи */
         .article-page {
             padding: 8rem 1.5rem 4rem;
             max-width: 800px;
@@ -37,9 +72,7 @@
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
-        .article-back:hover {
-            color: var(--color-accent);
-        }
+        .article-back:hover { color: var(--color-accent); }
         .article-hero-image {
             width: 100%;
             height: 380px;
@@ -68,9 +101,7 @@
             color: var(--color-text);
             line-height: 1.8;
         }
-        .article-content p {
-            margin-bottom: 1.5rem;
-        }
+        .article-content p { margin-bottom: 1.5rem; }
         .article-content img {
             max-width: 100%;
             height: auto;
@@ -84,9 +115,7 @@
             text-decoration: underline;
             text-underline-offset: 3px;
         }
-        .article-content a:hover {
-            color: var(--color-accent-dark);
-        }
+        .article-content a:hover { color: var(--color-accent-dark); }
         .article-content blockquote {
             border-left: 3px solid var(--color-accent);
             padding-left: 1.5rem;
@@ -129,7 +158,7 @@
 
         <div class="article-hero-image" style="background-image: url('{{IMAGE}}')"></div>
 
-        <span class="article-meta">{{DATE}}</span>
+        <time class="article-meta" datetime="{{DATE_ISO}}">{{DATE}}</time>
         <h1 class="article-title">{{TITLE}}</h1>
 
         <div class="article-content">
@@ -161,7 +190,7 @@
     <script>
         const nav = document.getElementById('nav');
         window.addEventListener('scroll', () => {
-            if (window.scrollY > 50) { nav.classList.add('scrolled'); } 
+            if (window.scrollY > 50) { nav.classList.add('scrolled'); }
             else { nav.classList.remove('scrolled'); }
         });
 
