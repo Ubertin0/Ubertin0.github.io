@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+Disallow: /post-*.html?*  # если будут query params
+Sitemap: https://balandinatherapy.ru/sitemap.xml
