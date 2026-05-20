@@ -19,7 +19,6 @@ def extract_image_url(msg) -> str | None:
         match = re.search(r"background-image:url\('?(.*?)'?\)", style)
         if match:
             return match.group(1)
-    # Fallback: первый <img> внутри текста сообщения
     text_div = msg.find('div', class_='tgme_widget_message_text')
     if text_div:
         img = text_div.find('img')
@@ -31,11 +30,23 @@ def clean_text_div(text_div) -> None:
     """Удаляем системный мусор Telegram, но сохраняем контентные изображения."""
     for tag in text_div.find_all(['i', 'svg', 'video']):
         tag.decompose()
-
     for img in text_div.find_all('img'):
         src = img.get('src', '')
         if 'emoji' in img.get('class', []) or '/emoji/' in src:
             img.decompose()
+
+def generate_sitemap(posts: list[str]) -> None:
+    """Генерирует sitemap.xml со списком всех страниц."""
+    sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n'
+    sitemap += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+    sitemap += '  <url><loc>https://balandinatherapy.ru/</loc><priority>1.0</priority></url>\n'
+    sitemap += '  <url><loc>https://balandinatherapy.ru/blog.html</loc><priority>0.8</priority></url>\n'
+    for post in posts:
+        sitemap += f'  <url><loc>https://balandinatherapy.ru/{post}</loc><priority>0.6</priority></url>\n'
+    sitemap += '</urlset>\n'
+    with open('sitemap.xml', 'w', encoding='utf-8') as f:
+        f.write(sitemap)
+    print("Успех: sitemap.xml обновлён!")
 
 def main() -> None:
     print("Запуск парсера Telegram-канала...")
@@ -63,6 +74,7 @@ def main() -> None:
         template = f.read()
 
     cards_html = ""
+    posts = []  # <-- Список для sitemap
 
     for msg in messages:
         text_div = msg.find('div', class_='tgme_widget_message_text')
@@ -117,7 +129,6 @@ def main() -> None:
             if image_url:
                 article_html = article_html.replace('{{IMAGE}}', image_url)
             else:
-                # Удаляем весь div с классом article-hero-image (вместе с inline-стилем)
                 article_html = re.sub(
                     r'<div[^>]*class="article-hero-image"[^>]*>.*?</div>\s*',
                     '',
@@ -127,6 +138,7 @@ def main() -> None:
                 )
 
         article_filename = f"post-{post_id}.html"
+        posts.append(article_filename)  # <-- Добавляем в список для sitemap
 
         with open(article_filename, 'w', encoding='utf-8') as f:
             f.write(article_html)
@@ -165,10 +177,10 @@ def main() -> None:
     parts2 = parts1[1].split(end_marker, 1)
 
     updated_blog = (
-        parts1[0] 
-        + start_marker + "\n" 
-        + cards_html + "\n            " 
-        + end_marker 
+        parts1[0]
+        + start_marker + "\n"
+        + cards_html + "\n            "
+        + end_marker
         + parts2[1]
     )
 
@@ -179,7 +191,10 @@ def main() -> None:
     with open(BLOG_FILE, 'w', encoding='utf-8') as f:
         f.write(updated_blog)
 
-    print(f"Успех: Сгенерировано {len(messages)} статей, блог обновлён!")
+    # --- Генерация sitemap.xml ---
+    generate_sitemap(posts)
+
+    print(f"Успех: Сгенерировано {len(messages)} статей, блог и sitemap обновлены!")
 
 if __name__ == "__main__":
     main()
