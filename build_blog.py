@@ -74,23 +74,26 @@ def main() -> None:
         template = f.read()
 
     cards_html = ""
-    posts = []  # <-- Список для sitemap
+    posts = []
 
     for msg in messages:
         text_div = msg.find('div', class_='tgme_widget_message_text')
         if not text_div:
             continue
 
-        # --- ДАТА ---
+        # --- ДАТА: оба формата ---
         time_tag = msg.find('time')
         if time_tag and time_tag.get('datetime'):
             try:
                 dt = datetime.fromisoformat(time_tag['datetime'])
                 post_date = dt.strftime("%d.%m.%Y")
+                post_date_iso = dt.strftime("%Y-%m-%d")
             except ValueError:
                 post_date = time_tag.text.strip() if time_tag.text else datetime.now().strftime("%d.%m.%Y")
+                post_date_iso = datetime.now().strftime("%Y-%m-%d")
         else:
             post_date = datetime.now().strftime("%d.%m.%Y")
+            post_date_iso = datetime.now().strftime("%Y-%m-%d")
 
         # --- ЗАГОЛОВОК ---
         bold_tag = text_div.find(['b', 'strong'])
@@ -121,6 +124,8 @@ def main() -> None:
         # --- Генерация HTML статьи ---
         article_html = template.replace('{{TITLE}}', title)\
                                .replace('{{DATE}}', post_date)\
+                               .replace('{{DATE_ISO}}', post_date_iso)\
+                               .replace('{{POST_ID}}', post_id)\
                                .replace('{{META_DESC}}', excerpt)\
                                .replace('{{CONTENT}}', content_html)
 
@@ -136,9 +141,23 @@ def main() -> None:
                     count=1,
                     flags=re.DOTALL
                 )
+                # Удаляем og:image если нет фото
+                article_html = re.sub(
+                    r'<meta property="og:image" content="{{IMAGE}}">\n',
+                    '',
+                    article_html,
+                    count=1
+                )
+                # Удаляем image из JSON-LD если нет фото
+                article_html = re.sub(
+                    r'"image": "{{IMAGE}}",\n',
+                    '',
+                    article_html,
+                    count=1
+                )
 
         article_filename = f"post-{post_id}.html"
-        posts.append(article_filename)  # <-- Добавляем в список для sitemap
+        posts.append(article_filename)
 
         with open(article_filename, 'w', encoding='utf-8') as f:
             f.write(article_html)
