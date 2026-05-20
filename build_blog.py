@@ -35,6 +35,10 @@ def clean_text_div(text_div) -> None:
         if 'emoji' in img.get('class', []) or '/emoji/' in src:
             img.decompose()
 
+def strip_hashtags(text: str) -> str:
+    """Удаляет хештеги вида #слово из текста."""
+    return re.sub(r'#\w+', '', text)
+
 def generate_sitemap(posts: list[str]) -> None:
     """Генерирует sitemap.xml со списком всех страниц."""
     sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n'
@@ -116,8 +120,9 @@ def main() -> None:
         post_link = msg.find('a', class_='tgme_widget_message_date')
         post_id = post_link['href'].split('/')[-1] if post_link else str(hash(text_div.get_text()))
 
-        content_html = str(text_div)
-        raw_text = text_div.get_text(separator=' ')
+        # --- УДАЛЯЕМ ХЕШТЕГИ ---
+        content_html = strip_hashtags(str(text_div))
+        raw_text = strip_hashtags(text_div.get_text(separator=' '))
 
         excerpt = raw_text[:140].strip() + ("..." if len(raw_text) > 140 else "")
 
@@ -141,14 +146,12 @@ def main() -> None:
                     count=1,
                     flags=re.DOTALL
                 )
-                # Удаляем og:image если нет фото
                 article_html = re.sub(
                     r'<meta property="og:image" content="{{IMAGE}}">\n',
                     '',
                     article_html,
                     count=1
                 )
-                # Удаляем image из JSON-LD если нет фото
                 article_html = re.sub(
                     r'"image": "{{IMAGE}}",\n',
                     '',
