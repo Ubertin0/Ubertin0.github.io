@@ -5,7 +5,6 @@ on:
     - cron: '0 2 * * *'
   workflow_dispatch:
 
-# ВАЖНО: Даем нашему боту права на запись в репозиторий
 permissions:
   contents: write
 
@@ -13,13 +12,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      # Обновляем версию до v4 (уберет желтое предупреждение)
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Полная история для git pull
+          fetch-depth: 0
 
-      # Обновляем версию до v5
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -35,8 +32,10 @@ jobs:
         run: |
           git config --global user.name "GitHub Action Bot"
           git config --global user.email "action@github.com"
-          git pull origin main --rebase || true
           git add .
-          # Проверяем, есть ли новые файлы. Если есть — сохраняем, если нет — просто завершаем работу без ошибки
+          git stash
+          git pull origin main --rebase
+          git stash pop
+          git add .
           git diff --quiet && git diff --staged --quiet || git commit -m "Auto-update blog with latest Telegram posts"
           git push
