@@ -6,7 +6,8 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 
 # --- Конфигурация ---
-BASE_DIR = os.getcwd()
+# Определяем базовую директорию: либо из переменной окружения, либо cwd, либо dirname(__file__)
+BASE_DIR = os.environ.get('GITHUB_WORKSPACE', os.getcwd() or os.path.dirname(os.path.abspath(__file__)))
 CHANNEL_URL = "https://t.me/s/balandinatherapy"
 TEMPLATE_FILE = os.path.join(BASE_DIR, "article-template.html")
 BLOG_FILE = os.path.join(BASE_DIR, "blog.html")
@@ -128,6 +129,13 @@ def main() -> None:
     if not messages:
         print("Внимание: В Telegram-канале не найдено сообщений.")
         return
+
+    # Отладка: показываем, где ищем файлы
+    print(f"DEBUG: BASE_DIR = {BASE_DIR}")
+    print(f"DEBUG: TEMPLATE_FILE = {TEMPLATE_FILE} (exists: {os.path.exists(TEMPLATE_FILE)})")
+    print(f"DEBUG: BLOG_FILE = {BLOG_FILE} (exists: {os.path.exists(BLOG_FILE)})")
+    print(f"DEBUG: cwd = {os.getcwd()}")
+    print(f"DEBUG: __file__ = {os.path.abspath(__file__)}")
 
     if not os.path.exists(TEMPLATE_FILE) or not os.path.exists(BLOG_FILE):
         print("Ошибка: Не найден article-template.html или blog.html!")
