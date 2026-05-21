@@ -6,9 +6,10 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 
 # --- Конфигурация ---
+BASE_DIR = os.getcwd()
 CHANNEL_URL = "https://t.me/s/balandinatherapy"
-TEMPLATE_FILE = "article-template.html"
-BLOG_FILE = "blog.html"
+TEMPLATE_FILE = os.path.join(BASE_DIR, "article-template.html")
+BLOG_FILE = os.path.join(BASE_DIR, "blog.html")
 POSTS_PER_PAGE = 15
 # --------------------
 
