@@ -16,6 +16,8 @@ jobs:
       # Обновляем версию до v4 (уберет желтое предупреждение)
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Полная история для git pull
 
       # Обновляем версию до v5
       - name: Set up Python
@@ -33,6 +35,7 @@ jobs:
         run: |
           git config --global user.name "GitHub Action Bot"
           git config --global user.email "action@github.com"
+          git pull origin main --rebase || true
           git add .
           # Проверяем, есть ли новые файлы. Если есть — сохраняем, если нет — просто завершаем работу без ошибки
           git diff --quiet && git diff --staged --quiet || git commit -m "Auto-update blog with latest Telegram posts"
