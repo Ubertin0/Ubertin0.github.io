@@ -6,8 +6,8 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 
 # --- Конфигурация ---
-# Определяем базовую директорию: либо из переменной окружения, либо cwd, либо dirname(__file__)
-BASE_DIR = os.environ.get('GITHUB_WORKSPACE', os.getcwd() or os.path.dirname(os.path.abspath(__file__)))
+# Скрипт лежит в корне репозитория, рядом с article-template.html и blog.html
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CHANNEL_URL = "https://t.me/s/balandinatherapy"
 TEMPLATE_FILE = os.path.join(BASE_DIR, "article-template.html")
 BLOG_FILE = os.path.join(BASE_DIR, "blog.html")
@@ -53,16 +53,25 @@ def generate_sitemap(posts: list[str]) -> None:
     for post in posts:
         sitemap += f'  <url><loc>https://balandinatherapy.ru/{post}</loc><priority>0.6</priority></url>\n'
     sitemap += '</urlset>\n'
-    with open('sitemap.xml', 'w', encoding='utf-8') as f:
+    with open(os.path.join(BASE_DIR, 'sitemap.xml'), 'w', encoding='utf-8') as f:
         f.write(sitemap)
     print(f"Успех: sitemap.xml обновлён! ({len(posts)} постов, {len(pages)} страниц)")
 
 def generate_blog_page(page_num: int, cards: list[str], total_pages: int) -> str:
     """Генерирует HTML одной страницы блога с пагинацией."""
 
-    # Читаем шаблон blog.html для структуры
+    # Читаем ЧИСТЫЙ шаблон (без пагинации) — это исходный blog.html
+    # Если blog.html уже содержит пагинацию от предыдущего прогона — очищаем
     with open(BLOG_FILE, 'r', encoding='utf-8') as f:
-        template = f.read()
+        raw_template = f.read()
+
+    # Очищаем от старой пагинации (всё от <div class="blog-pagination"> до </main>)
+    template = re.sub(
+        r'<div class="blog-pagination".*?</div>\s*',
+        '',
+        raw_template,
+        flags=re.DOTALL
+    )
 
     start_marker = "<!-- START ARTICLES -->"
     end_marker = "<!-- END ARTICLES -->"
@@ -73,10 +82,8 @@ def generate_blog_page(page_num: int, cards: list[str], total_pages: int) -> str
     parts1 = template.split(start_marker, 1)
     parts2 = parts1[1].split(end_marker, 1)
 
-    # Собираем карточки
     cards_html = "\n".join(cards)
 
-    # Пагинация
     pagination = '<div class="blog-pagination" style="display: flex; justify-content: center; gap: 0.5rem; margin-top: 3rem; flex-wrap: wrap;">'
 
     if page_num > 1:
@@ -96,7 +103,6 @@ def generate_blog_page(page_num: int, cards: list[str], total_pages: int) -> str
 
     pagination += '</div>'
 
-    # Заголовок страницы (для blog-2, blog-3 и т.д.)
     page_title = ""
     if page_num > 1:
         page_title = f'<h2 style="text-align: center; margin-bottom: 2rem; font-family: var(--font-heading); color: var(--color-text-muted);">Страница {page_num}</h2>'
@@ -106,6 +112,7 @@ def generate_blog_page(page_num: int, cards: list[str], total_pages: int) -> str
         + start_marker + "\n"
         + page_title + cards_html + "\n            "
         + end_marker
+        + end_marker + "\n"
         + pagination + "\n"
         + parts2[1]
     )
@@ -114,6 +121,9 @@ def generate_blog_page(page_num: int, cards: list[str], total_pages: int) -> str
 
 def main() -> None:
     print("Запуск парсера Telegram-канала...")
+    print(f"DEBUG: BASE_DIR = {BASE_DIR}")
+    print(f"DEBUG: TEMPLATE_FILE = {TEMPLATE_FILE}")
+    print(f"DEBUG: BLOG_FILE = {BLOG_FILE}")
 
     try:
         headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
@@ -124,39 +134,31 @@ def main() -> None:
         return
 
     soup = BeautifulSoup(response.text, 'html.parser')
-    messages = soup.find_all('div', class_='tgme_widget_message_wrap', limit=100)  # Парсим больше для накопления
+    messages = soup.find_all('div', class_='tgme_widget_message_wrap', limit=100)
 
     if not messages:
         print("Внимание: В Telegram-канале не найдено сообщений.")
         return
 
-    # Отладка: показываем, где ищем файлы
-    print(f"DEBUG: BASE_DIR = {BASE_DIR}")
-    print(f"DEBUG: TEMPLATE_FILE = {TEMPLATE_FILE} (exists: {os.path.exists(TEMPLATE_FILE)})")
-    print(f"DEBUG: BLOG_FILE = {BLOG_FILE} (exists: {os.path.exists(BLOG_FILE)})")
-    print(f"DEBUG: cwd = {os.getcwd()}")
-    print(f"DEBUG: __file__ = {os.path.abspath(__file__)}")
-
     if not os.path.exists(TEMPLATE_FILE) or not os.path.exists(BLOG_FILE):
         print("Ошибка: Не найден article-template.html или blog.html!")
+        print(f"DEBUG: Проверьте, что файлы находятся в: {BASE_DIR}")
         return
 
     with open(TEMPLATE_FILE, 'r', encoding='utf-8') as f:
         template = f.read()
 
-    # --- НАКОПЛЕНИЕ: собираем существующие посты ---
-    existing_posts = set(glob.glob('post-*.html'))
+    existing_posts = set(glob.glob(os.path.join(BASE_DIR, 'post-*.html')))
     print(f"Найдено существующих постов: {len(existing_posts)}")
 
     new_posts_count = 0
-    all_cards = []  # Все карточки для пагинации
+    all_cards = []
 
     for msg in messages:
         text_div = msg.find('div', class_='tgme_widget_message_text')
         if not text_div:
             continue
 
-        # --- ДАТА ---
         time_tag = msg.find('time')
         if time_tag and time_tag.get('datetime'):
             try:
@@ -170,7 +172,6 @@ def main() -> None:
             post_date = datetime.now().strftime("%d.%m.%Y")
             post_date_iso = datetime.now().strftime("%Y-%m-%d")
 
-        # --- ЗАГОЛОВОК ---
         bold_tag = text_div.find(['b', 'strong'])
         if bold_tag:
             title = bold_tag.get_text(strip=True)
@@ -182,26 +183,21 @@ def main() -> None:
             if len(title) > 150:
                 title = title[:150] + "..."
 
-        # --- ОЧИСТКА ---
         clean_text_div(text_div)
-
-        # --- ИЗОБРАЖЕНИЯ ---
         image_url = extract_image_url(msg)
 
         post_link = msg.find('a', class_='tgme_widget_message_date')
         post_id = post_link['href'].split('/')[-1] if post_link else str(hash(text_div.get_text()))
         article_filename = f"post-{post_id}.html"
+        article_path = os.path.join(BASE_DIR, article_filename)
 
-        # --- НАКОПЛЕНИЕ: пропускаем существующие ---
-        if article_filename in existing_posts:
+        if article_path in existing_posts:
             print(f"  Пропуск (уже существует): {article_filename}")
         else:
-            # --- УДАЛЯЕМ ХЕШТЕГИ ---
             content_html = strip_hashtags(str(text_div))
             raw_text = strip_hashtags(text_div.get_text(separator=' '))
             excerpt = raw_text[:140].strip() + ("..." if len(raw_text) > 140 else "")
 
-            # --- Генерация HTML статьи ---
             article_html = template.replace('{{TITLE}}', title)\
                                    .replace('{{DATE}}', post_date)\
                                    .replace('{{DATE_ISO}}', post_date_iso)\
@@ -209,7 +205,6 @@ def main() -> None:
                                    .replace('{{META_DESC}}', excerpt)\
                                    .replace('{{CONTENT}}', content_html)
 
-            # --- ИЗОБРАЖЕНИЕ ---
             if '{{IMAGE}}' in template:
                 if image_url:
                     article_html = article_html.replace('{{IMAGE}}', image_url)
@@ -234,13 +229,12 @@ def main() -> None:
                         count=1
                     )
 
-            with open(article_filename, 'w', encoding='utf-8') as f:
+            with open(article_path, 'w', encoding='utf-8') as f:
                 f.write(article_html)
 
             new_posts_count += 1
             print(f"  Создан: {article_filename}")
 
-        # --- Карточка (всегда добавляем в список для пагинации) ---
         image_block = ""
         if image_url:
             image_block = f'\n                <div class="article-card__image" style="background-image: url(\'{image_url}\')"></div>'
@@ -250,34 +244,28 @@ def main() -> None:
                 <div class="article-card__content">
                     <div class="article-card__date">{post_date}</div>
                     <h2 class="article-card__title">{title}</h2>
-                    <p class="article-card__excerpt">{excerpt if not article_filename in existing_posts else "..."}</p>
+                    <p class="article-card__excerpt">...</p>
                     <div class="article-card__readmore">Читать статью →</div>
                 </div>
             </a>'''
         all_cards.append((post_date, article_filename, card_html))
 
-    # --- СОРТИРОВКА: новые сверху ---
-    # Собираем карточки из ВСЕХ существующих постов (не только из Telegram)
     for post_file in existing_posts:
         if post_file not in [c[1] for c in all_cards]:
-            # Извлекаем дату из HTML файла для сортировки
             try:
                 with open(post_file, 'r', encoding='utf-8') as f:
                     post_html = f.read()
                 date_match = re.search(r'<time[^>]*datetime="(\d{4}-\d{2}-\d{2})"[^>]*>(.*?)</time>', post_html)
                 if date_match:
                     post_date = date_match.group(2)
-                    post_date_iso = date_match.group(1)
                 else:
                     post_date = "01.01.2020"
-                    post_date_iso = "2020-01-01"
 
                 title_match = re.search(r'<h1[^>]*class="article-title"[^>]*>(.*?)</h1>', post_html)
                 title = title_match.group(1) if title_match else "Без названия"
 
-                # Простая карточка без изображения (уже существующий пост)
                 card_html = f'''
-            <a href="{post_file}" class="article-card">
+            <a href="{os.path.basename(post_file)}" class="article-card">
                 <div class="article-card__content">
                     <div class="article-card__date">{post_date}</div>
                     <h2 class="article-card__title">{title}</h2>
@@ -285,11 +273,10 @@ def main() -> None:
                     <div class="article-card__readmore">Читать статью →</div>
                 </div>
             </a>'''
-                all_cards.append((post_date, post_file, card_html))
+                all_cards.append((post_date, os.path.basename(post_file), card_html))
             except Exception as e:
                 print(f"  Ошибка чтения {post_file}: {e}")
 
-    # Сортируем по дате (новые сверху)
     all_cards.sort(key=lambda x: datetime.strptime(x[0], "%d.%m.%Y") if len(x[0]) == 10 else datetime.now(), reverse=True)
 
     total_posts = len(all_cards)
@@ -297,7 +284,6 @@ def main() -> None:
 
     print(f"Всего постов: {total_posts}, страниц: {total_pages}, новых: {new_posts_count}")
 
-    # --- ГЕНЕРАЦИЯ СТРАНИЦ БЛОГА ---
     for page_num in range(1, total_pages + 1):
         start_idx = (page_num - 1) * POSTS_PER_PAGE
         end_idx = start_idx + POSTS_PER_PAGE
@@ -305,12 +291,11 @@ def main() -> None:
 
         page_html = generate_blog_page(page_num, page_cards, total_pages)
 
-        page_file = "blog.html" if page_num == 1 else f"blog-{page_num}.html"
+        page_file = os.path.join(BASE_DIR, "blog.html" if page_num == 1 else f"blog-{page_num}.html")
         with open(page_file, 'w', encoding='utf-8') as f:
             f.write(page_html)
-        print(f"  Сгенерирована: {page_file} ({len(page_cards)} карточек)")
+        print(f"  Сгенерирована: {os.path.basename(page_file)} ({len(page_cards)} карточек)")
 
-    # --- Генерация sitemap.xml ---
     all_post_files = [c[1] for c in all_cards]
     generate_sitemap(all_post_files)
 
