@@ -13,6 +13,15 @@ BLOG_FILE = os.path.join(BASE_DIR, "blog.html")
 POSTS_PER_PAGE = 15
 # --------------------
 
+def is_valid_image_url(url: str | None) -> bool:
+    """Проверяет, что URL — реальное изображение, а не placeholder или fallback."""
+    if not url or url.strip() in ('{{IMAGE}}', 'None', '', 'null'):
+        return False
+    # Относительные пути (photo.jpg, /img/...) — это fallback-фото сайта, не из Telegram
+    if not url.strip().startswith('http'):
+        return False
+    return True
+
 def extract_image_url(msg) -> str | None:
     """Извлекает URL обложки из сообщения Telegram."""
     photo_wrap = msg.find('a', class_='tgme_widget_message_photo_wrap')
@@ -64,17 +73,31 @@ def generate_sitemap(posts: list[str], total_pages: int) -> None:
 def remove_image_from_article(article_html: str) -> str:
     """Удаляет hero-image, og:image и JSON-LD image из HTML статьи."""
     soup = BeautifulSoup(article_html, 'html.parser')
-    hero = soup.find('div', class_='article-hero-image')
-    if hero:
+
+    # Удаляем div с классом article-hero-image (в любом виде)
+    for hero in soup.find_all('div', class_='article-hero-image'):
         hero.decompose()
-    og_meta = soup.find('meta', property='og:image')
-    if og_meta:
-        og_meta.decompose()
-    tw_meta = soup.find('meta', attrs={'name': 'twitter:image'})
-    if tw_meta:
-        tw_meta.decompose()
+
+    # Удаляем все meta og:image и twitter:image
+    for meta in soup.find_all('meta', property='og:image'):
+        meta.decompose()
+    for meta in soup.find_all('meta', attrs={'name': 'twitter:image'}):
+        meta.decompose()
+
     html_str = str(soup)
+
+    # Удаляем "image" из JSON-LD (любое значение, включая placeholder)
     html_str = re.sub(r'"image":\s*"[^"]*",?\s*', '', html_str, count=1)
+
+    # Удаляем background-image из style, если div article-hero-image остался
+    # (на случай если BeautifulSoup не поймал его из-за сломанного HTML)
+    html_str = re.sub(
+        r'<div[^>]*class="article-hero-image"[^>]*>.*?</div>\s*',
+        '',
+        html_str,
+        flags=re.DOTALL
+    )
+
     return html_str
 
 def generate_blog_page(page_num: int, cards: list[str], total_pages: int) -> str:
@@ -121,6 +144,61 @@ def generate_blog_page(page_num: int, cards: list[str], total_pages: int) -> str
     )
     return content
 
+def clean_fallback_from_existing_post(post_path: str) -> bool:
+    """
+    Проверяет старый post-*.html: если hero-image содержит fallback (не http-URL),
+    удаляет весь hero-блок, og:image и JSON-LD image, и перезаписывает файл.
+    Возвращает True, если файл был изменён.
+    """
+    try:
+        with open(post_path, 'r', encoding='utf-8') as f:
+            html = f.read()
+    except Exception:
+        return False
+
+    soup = BeautifulSoup(html, 'html.parser')
+    changed = False
+
+    # Проверяем hero-image
+    for hero in soup.find_all('div', class_='article-hero-image'):
+        style = hero.get('style', '')
+        match = re.search(r"background-image:url\('?(.*?)'?\)", style)
+        if match:
+            url = match.group(1)
+            if not is_valid_image_url(url):
+                hero.decompose()
+                changed = True
+
+    # Проверяем og:image
+    for meta in soup.find_all('meta', property='og:image'):
+        if not is_valid_image_url(meta.get('content')):
+            meta.decompose()
+            changed = True
+
+    # Проверяем twitter:image
+    for meta in soup.find_all('meta', attrs={'name': 'twitter:image'}):
+        if not is_valid_image_url(meta.get('content')):
+            meta.decompose()
+            changed = True
+
+    if not changed:
+        return False
+
+    html_str = str(soup)
+    # Чистим JSON-LD
+    html_str = re.sub(r'"image":\s*"[^"]*",?\s*', '', html_str, count=1)
+    # Резервный regex на случай сломанного HTML
+    html_str = re.sub(
+        r'<div[^>]*class="article-hero-image"[^>]*>.*?</div>\s*',
+        '',
+        html_str,
+        flags=re.DOTALL
+    )
+
+    with open(post_path, 'w', encoding='utf-8') as f:
+        f.write(html_str)
+    return True
+
 def extract_excerpt_from_html(html: str) -> str:
     """Извлекает первые ~140 символов текста из HTML статьи."""
     soup = BeautifulSoup(html, 'html.parser')
@@ -138,20 +216,20 @@ def extract_image_from_html(html: str) -> str | None:
     """Извлекает URL изображения из уже сохранённой статьи."""
     soup = BeautifulSoup(html, 'html.parser')
     og = soup.find('meta', property='og:image')
-    if og and og.get('content') and og['content'] != '{{IMAGE}}':
+    if og and is_valid_image_url(og.get('content')):
         return og['content']
     tw = soup.find('meta', attrs={'name': 'twitter:image'})
-    if tw and tw.get('content') and tw['content'] != '{{IMAGE}}':
+    if tw and is_valid_image_url(tw.get('content')):
         return tw['content']
     hero = soup.find('div', class_='article-hero-image')
     if hero and hero.get('style'):
         match = re.search(r"background-image:url\('?(.*?)'?\)", hero['style'])
-        if match and match.group(1) != '{{IMAGE}}':
+        if match and is_valid_image_url(match.group(1)):
             return match.group(1)
     article = soup.find('article') or soup.find('div', class_='article-content')
     if article:
         img = article.find('img')
-        if img and img.get('src') and img['src'] != '{{IMAGE}}':
+        if img and is_valid_image_url(img.get('src')):
             return img['src']
     return None
 
@@ -244,6 +322,10 @@ def main() -> None:
         basename = os.path.basename(post_file)
         if basename in current_files:
             continue
+        # Чистим fallback-фото из старого файла, если оно там есть
+        cleaned = clean_fallback_from_existing_post(post_file)
+        if cleaned:
+            print(f"  Очищен fallback: {basename}")
         try:
             with open(post_file, 'r', encoding='utf-8') as f:
                 post_html = f.read()
