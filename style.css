@@ -203,6 +203,50 @@ body { font-family: var(--font-body); color: var(--color-text); background-color
 .article-card__readmore { font-size: 0.85rem; color: var(--color-accent); font-weight: 500; display: inline-flex; align-items: center; gap: 0.5rem; }
 .article-card:hover .article-card__readmore { color: var(--color-accent-dark); }
 
+
+/* ================= ПАГИНАЦИЯ БЛОГА ================= */
+.blog-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 3rem;
+    flex-wrap: wrap;
+    padding: 0 1rem;
+}
+.blog-pagination a,
+.blog-pagination span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 1rem;
+    border-radius: 100px;
+    font-size: 0.85rem;
+    text-decoration: none;
+    transition: var(--transition);
+    min-width: 40px;
+    height: 40px;
+}
+.blog-pagination a {
+    border: 1px solid var(--color-bg-dark);
+    color: var(--color-text);
+}
+.blog-pagination a:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    transform: translateY(-2px);
+}
+.blog-pagination span {
+    background: var(--color-accent);
+    color: white;
+    font-weight: 500;
+    border: 1px solid var(--color-accent);
+}
+.blog-pagination .btn--outline {
+    border-color: var(--color-warm);
+    font-size: 0.85rem;
+    padding: 0.5rem 1.2rem;
+}
 /* ================= АНИМАЦИИ И ПРЕЛОАДЕР ================= */
 .page-loader { position: fixed; inset: 0; background: var(--color-bg); z-index: 9999; display: flex; align-items: center; justify-content: center; transition: opacity 0.6s ease, visibility 0.6s ease; }
 .page-loader.hidden { opacity: 0; visibility: hidden; }
@@ -254,6 +298,9 @@ body { font-family: var(--font-body); color: var(--color-text); background-color
     .quote__text::before, .quote__text::after { display: none; }
     .footer__container { flex-direction: column; text-align: center; }
     .modal__body { padding: 2rem 1.5rem; }
+    .blog-pagination { gap: 0.35rem; margin-top: 2rem; }
+    .blog-pagination a,
+    .blog-pagination span { padding: 0.4rem 0.8rem; font-size: 0.8rem; min-width: 36px; height: 36px; }
     .blog-header { padding: 7rem 1.5rem 3rem; }
     .blog-grid { padding: 3rem 1.5rem; grid-template-columns: 1fr; }
 }
