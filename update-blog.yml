@@ -14,8 +14,6 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -26,16 +24,10 @@ jobs:
         run: |
           pip install requests beautifulsoup4
 
-      - name: Pull latest & run generator
+      - name: Run generator
         run: |
           git config user.name "GitHub Action Bot"
           git config user.email "action@github.com"
-
-          # Безопасный pull: stash только если есть изменения, pop только если stash создался
-          git stash push -m "auto-stash" || true
-          git pull origin main --rebase || true
-          git stash pop || true
-
           python build_blog.py
         env:
           PYTHONUNBUFFERED: 1
