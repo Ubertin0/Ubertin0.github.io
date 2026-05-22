@@ -1,11 +1,10 @@
-name: Auto Update Blog from Telegram
+name: Update Blog from Telegram
 
 on:
   schedule:
-    - cron: '0 2 * * *'
+    - cron: '0 */6 * * *'  # Каждые 6 часов
   workflow_dispatch:
 
-# ВАЖНО: Даем нашему боту права на запись в репозиторий
 permissions:
   contents: write
 
@@ -13,29 +12,40 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout repo
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Set up Python
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
-
-      - name: Run parser
-        run: python build_blog.py
-        env:
-          GITHUB_WORKSPACE: ${{ github.workspace }}
-
-      - name: Commit and push changes
         run: |
-          git config --global user.name "GitHub Action Bot"
-          git config --global user.email "action@github.com"
+          pip install requests beautifulsoup4
+
+      - name: Pull latest & run generator
+        run: |
+          git config user.name "GitHub Action Bot"
+          git config user.email "action@github.com"
+
+          # Безопасный pull: stash только если есть изменения, pop только если stash создался
+          git stash push -m "auto-stash" || true
           git pull origin main --rebase || true
-          git add .
-          git diff --quiet && git diff --staged --quiet || git commit -m "Auto-update blog with latest Telegram posts"
-          git push
+          git stash pop || true
+
+          python build_blog.py
+        env:
+          PYTHONUNBUFFERED: 1
+
+      - name: Commit and push
+        run: |
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "auto: update blog $(date +'%Y-%m-%d %H:%M')"
+            git push origin main
+          fi
