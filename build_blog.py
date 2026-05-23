@@ -72,14 +72,18 @@ def remove_image_from_article(article_html: str) -> str:
     html_str = re.sub(r'<div[^>]*class="article-hero-image"[^>]*>.*?</div>\s*', '', html_str, flags=re.DOTALL)
     return html_str
 
-def generate_blog_page(page_num: int, cards: list[str], total_pages: int) -> str:
-    with open(BLOG_FILE, 'r', encoding='utf-8') as f:
-        template = f.read()
-    
-    # 1. Очищаем старую пагинацию
-    template = re.sub(r'<div class="blog-pagination".*?</div>\s*', '', template, flags=re.DOTALL)
-    
-    # 2. Собираем карточки и HTML пагинации
+def generate_blog_page(page_num: int, cards: list[str], total_pages: int, raw_template: str) -> str:
+    """Безопасная генерация страницы (без регулярных выражений)."""
+    parts1 = raw_template.split("", 1)
+    if len(parts1) < 2:
+        print("КРИТИЧЕСКАЯ ОШИБКА: Маркер не найден!")
+        return raw_template
+        
+    parts2 = parts1[1].split("", 1)
+    if len(parts2) < 2:
+        print("КРИТИЧЕСКАЯ ОШИБКА: Маркер не найден!")
+        return raw_template
+
     cards_html = "\n".join(cards)
     pagination = '<div class="blog-pagination">'
     
@@ -104,20 +108,18 @@ def generate_blog_page(page_num: int, cards: list[str], total_pages: int) -> str
     if page_num > 1:
         page_title = f'<h2 style="text-align: center; margin-bottom: 2rem; font-family: var(--font-heading); color: var(--color-text-muted);">Страница {page_num}</h2>\n'
         
-    # 3. БРОНИРОВАННЫЙ БЛОК: никаких split(), только регулярные выражения
-    new_block = "\n" + page_title + cards_html + "\n            \n" + pagination
-    
-    if "" in template and "" in template:
-        template = re.sub(
-            r'.*?',
-            new_block,
-            template,
-            flags=re.DOTALL
-        )
-    else:
-        print("ВНИМАНИЕ: Маркеры не найдены. Сборка не упадет, но контент может не обновиться.")
-        
-    return template
+    # Вставляем пагинацию ВНУТРЬ маркеров. Это решает проблему дублей навсегда.
+    content = (
+        parts1[0]
+        + "\n"
+        + page_title 
+        + cards_html 
+        + "\n" 
+        + pagination 
+        + "\n            "
+        + parts2[1]
+    )
+    return content
 
 def clean_fallback_from_existing_post(post_path: str) -> bool:
     try:
@@ -206,7 +208,11 @@ def main() -> None:
         return
         
     with open(TEMPLATE_FILE, 'r', encoding='utf-8') as f:
-        template = f.read()
+        article_template = f.read()
+        
+    # Читаем шаблон блога ОДИН РАЗ, до цикла!
+    with open(BLOG_FILE, 'r', encoding='utf-8') as f:
+        blog_template = f.read()
         
     existing_posts = set(glob.glob(os.path.join(BASE_DIR, 'post-*.html')))
     new_posts_count = 0
@@ -267,12 +273,12 @@ def main() -> None:
             raw_text = strip_hashtags(text_div.get_text(separator=' '))
             excerpt = raw_text[:140].strip() + ("..." if len(raw_text) > 140 else "")
             
-            article_html = template.replace('{{TITLE}}', title)\
-                                   .replace('{{DATE}}', post_date)\
-                                   .replace('{{DATE_ISO}}', post_date_iso)\
-                                   .replace('{{POST_ID}}', post_id)\
-                                   .replace('{{META_DESC}}', excerpt)\
-                                   .replace('{{CONTENT}}', content_html)
+            article_html = article_template.replace('{{TITLE}}', title)\
+                                           .replace('{{DATE}}', post_date)\
+                                           .replace('{{DATE_ISO}}', post_date_iso)\
+                                           .replace('{{POST_ID}}', post_id)\
+                                           .replace('{{META_DESC}}', excerpt)\
+                                           .replace('{{CONTENT}}', content_html)
             
             if image_url:
                 article_html = article_html.replace('{{IMAGE}}', image_url)
@@ -339,7 +345,10 @@ def main() -> None:
         start_idx = (page_num - 1) * POSTS_PER_PAGE
         end_idx = start_idx + POSTS_PER_PAGE
         page_cards = [c[2] for c in all_cards[start_idx:end_idx]]
-        page_html = generate_blog_page(page_num, page_cards, total_pages)
+        
+        # Передаем blog_template, прочитанный из памяти!
+        page_html = generate_blog_page(page_num, page_cards, total_pages, blog_template)
+        
         page_file = os.path.join(BASE_DIR, "blog.html" if page_num == 1 else f"blog-{page_num}.html")
         with open(page_file, 'w', encoding='utf-8') as f:
             f.write(page_html)
