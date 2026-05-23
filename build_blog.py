@@ -11,6 +11,10 @@ CHANNEL_URL = "https://t.me/s/balandinatherapy"
 TEMPLATE_FILE = os.path.join(BASE_DIR, "article-template.html")
 BLOG_FILE = os.path.join(BASE_DIR, "blog.html")
 POSTS_PER_PAGE = 15
+
+# DevOps-трюк: прячем HTML-маркеры от автоформаттеров VS Code
+MARKER_START = "<" + "!-- START ARTICLES --" + ">"
+MARKER_END = "<" + "!-- END ARTICLES --" + ">"
 # --------------------
 
 def is_valid_image_url(url: str | None) -> bool:
@@ -27,7 +31,6 @@ def extract_image_url(msg) -> str | None:
         match = re.search(r"background-image:url\('?(.*?)'?\)", style)
         if match:
             return match.group(1)
-
     text_div = msg.find('div', class_='tgme_widget_message_text')
     if text_div:
         for img in text_div.find_all('img'):
@@ -57,7 +60,6 @@ def generate_sitemap(posts: list[str], total_pages: int) -> None:
     sitemap += '</urlset>\n'
     with open(os.path.join(BASE_DIR, 'sitemap.xml'), 'w', encoding='utf-8') as f:
         f.write(sitemap)
-    print(f"Успех: sitemap.xml обновлён! ({len(posts)} постов, {len(pages)} страниц)")
 
 def remove_image_from_article(article_html: str) -> str:
     soup = BeautifulSoup(article_html, 'html.parser')
@@ -73,15 +75,15 @@ def remove_image_from_article(article_html: str) -> str:
     return html_str
 
 def generate_blog_page(page_num: int, cards: list[str], total_pages: int, raw_template: str) -> str:
-    """Безопасная генерация страницы (без регулярных выражений)."""
-    parts1 = raw_template.split("", 1)
+    # Используем собранные переменные
+    parts1 = raw_template.split(MARKER_START, 1)
     if len(parts1) < 2:
-        print("КРИТИЧЕСКАЯ ОШИБКА: Маркер не найден!")
+        print("ВНИМАНИЕ: Маркер START ARTICLES не найден в шаблоне!")
         return raw_template
         
-    parts2 = parts1[1].split("", 1)
+    parts2 = parts1[1].split(MARKER_END, 1)
     if len(parts2) < 2:
-        print("КРИТИЧЕСКАЯ ОШИБКА: Маркер не найден!")
+        print("ВНИМАНИЕ: Маркер END ARTICLES не найден в шаблоне!")
         return raw_template
 
     cards_html = "\n".join(cards)
@@ -108,15 +110,14 @@ def generate_blog_page(page_num: int, cards: list[str], total_pages: int, raw_te
     if page_num > 1:
         page_title = f'<h2 style="text-align: center; margin-bottom: 2rem; font-family: var(--font-heading); color: var(--color-text-muted);">Страница {page_num}</h2>\n'
         
-    # Вставляем пагинацию ВНУТРЬ маркеров. Это решает проблему дублей навсегда.
     content = (
         parts1[0]
-        + "\n"
+        + MARKER_START + "\n"
         + page_title 
         + cards_html 
         + "\n" 
         + pagination 
-        + "\n            "
+        + "\n            " + MARKER_END
         + parts2[1]
     )
     return content
@@ -210,7 +211,6 @@ def main() -> None:
     with open(TEMPLATE_FILE, 'r', encoding='utf-8') as f:
         article_template = f.read()
         
-    # Читаем шаблон блога ОДИН РАЗ, до цикла!
     with open(BLOG_FILE, 'r', encoding='utf-8') as f:
         blog_template = f.read()
         
@@ -335,7 +335,7 @@ def main() -> None:
             all_cards.append((post_date, basename, card_html))
             
         except Exception as e:
-            print(f"  Ошибка чтения {post_file}: {e}")
+            pass
             
     all_cards.sort(key=lambda x: datetime.strptime(x[0], "%d.%m.%Y") if len(x[0]) == 10 else datetime.now(), reverse=True)
     total_posts = len(all_cards)
@@ -345,10 +345,7 @@ def main() -> None:
         start_idx = (page_num - 1) * POSTS_PER_PAGE
         end_idx = start_idx + POSTS_PER_PAGE
         page_cards = [c[2] for c in all_cards[start_idx:end_idx]]
-        
-        # Передаем blog_template, прочитанный из памяти!
         page_html = generate_blog_page(page_num, page_cards, total_pages, blog_template)
-        
         page_file = os.path.join(BASE_DIR, "blog.html" if page_num == 1 else f"blog-{page_num}.html")
         with open(page_file, 'w', encoding='utf-8') as f:
             f.write(page_html)
