@@ -111,13 +111,18 @@ def generate_blog_page(page_num: int, cards: list[str], total_pages: int) -> str
         raw_template,
         flags=re.DOTALL
     )
+    
     start_marker = ""
     end_marker = ""
+    
     if start_marker not in template or end_marker not in template:
-        raise ValueError("Маркеры не найдены в blog.html")
+        raise ValueError(f"Маркеры {start_marker} или {end_marker} не найдены в blog.html")
+        
     parts1 = template.split(start_marker, 1)
     parts2 = parts1[1].split(end_marker, 1)
+    
     cards_html = "\n".join(cards)
+    
     pagination = '<div class="blog-pagination">'
     if page_num > 1:
         prev_page = "blog.html" if page_num == 2 else f"blog-{page_num - 1}.html"
@@ -132,9 +137,11 @@ def generate_blog_page(page_num: int, cards: list[str], total_pages: int) -> str
         next_page = f"blog-{page_num + 1}.html"
         pagination += f'<a href="{next_page}" class="btn btn--outline">Вперёд →</a>'
     pagination += '</div>'
+    
     page_title = ""
     if page_num > 1:
         page_title = f'<h2 style="text-align: center; margin-bottom: 2rem; font-family: var(--font-heading); color: var(--color-text-muted);">Страница {page_num}</h2>'
+        
     content = (
         parts1[0]
         + start_marker + "\n"
@@ -246,25 +253,33 @@ def main() -> None:
     except Exception as e:
         print(f"Ошибка сети: {e}")
         return
+    
     soup = BeautifulSoup(response.text, 'html.parser')
     messages = soup.find_all('div', class_='tgme_widget_message_wrap', limit=100)
+    
     if not messages:
         print("Внимание: В Telegram-канале не найдено сообщений.")
         return
+        
     if not os.path.exists(TEMPLATE_FILE) or not os.path.exists(BLOG_FILE):
         print("Ошибка: Не найден article-template.html или blog.html!")
         print(f"DEBUG: Проверьте, что файлы находятся в: {BASE_DIR}")
         return
+        
     with open(TEMPLATE_FILE, 'r', encoding='utf-8') as f:
         template = f.read()
+        
     existing_posts = set(glob.glob(os.path.join(BASE_DIR, 'post-*.html')))
     print(f"Найдено существующих постов: {len(existing_posts)}")
+    
     new_posts_count = 0
     all_cards = []
+    
     for msg in messages:
         text_div = msg.find('div', class_='tgme_widget_message_text')
         if not text_div:
             continue
+            
         time_tag = msg.find('time')
         if time_tag and time_tag.get('datetime'):
             try:
@@ -286,7 +301,6 @@ def main() -> None:
             bold_tag.decompose()
         else:
             title = "Без названия"
-            # Ищем первую непустую текстовую ноду
             for element in text_div.descendants:
                 if element.name is None and element.string and element.string.strip():
                     full_text = element.string.strip()
@@ -294,12 +308,10 @@ def main() -> None:
                     if len(title) > 120:
                         title = title[:120] + "..."
                     
-                    # Отсекаем текст заголовка из основного контента, чтобы избежать дубля под H1
                     remaining_text = full_text.replace(title, '', 1).lstrip('. \n')
                     element.replace_with(remaining_text)
                     break
                     
-        # Удаляем висячие переносы строк в начале контента (если они остались после удаления заголовка)
         for child in list(text_div.children):
             if child.name == 'br' or (child.name is None and not child.string.strip()):
                 child.extract()
@@ -312,45 +324,55 @@ def main() -> None:
         post_id = post_link['href'].split('/')[-1] if post_link else str(hash(text_div.get_text()))
         article_filename = f"post-{post_id}.html"
         article_path = os.path.join(BASE_DIR, article_filename)
+        
         if article_path in existing_posts:
             print(f"  Пропуск (уже существует): {article_filename}")
         else:
             content_html = strip_hashtags(str(text_div))
             raw_text = strip_hashtags(text_div.get_text(separator=' '))
             excerpt = raw_text[:140].strip() + ("..." if len(raw_text) > 140 else "")
+            
             article_html = template.replace('{{TITLE}}', title)\
                                    .replace('{{DATE}}', post_date)\
                                    .replace('{{DATE_ISO}}', post_date_iso)\
                                    .replace('{{POST_ID}}', post_id)\
                                    .replace('{{META_DESC}}', excerpt)\
                                    .replace('{{CONTENT}}', content_html)
+            
             if image_url:
                 article_html = article_html.replace('{{IMAGE}}', image_url)
             else:
                 article_html = remove_image_from_article(article_html)
+                
             with open(article_path, 'w', encoding='utf-8') as f:
                 f.write(article_html)
             new_posts_count += 1
             print(f"  Создан: {article_filename}")
+            
         image_block = ""
         if image_url:
             image_block = f'\n                <div class="article-card__image" style="background-image: url(\'{image_url}\')"></div>'
+            
         card_html = f"""\n            <a href="{article_filename}" class="article-card">{image_block}\n                <div class="article-card__content">\n                    <div class="article-card__date">{post_date}</div>\n                    <h2 class="article-card__title">{title}</h2>\n                    <p class="article-card__excerpt">...</p>\n                    <div class="article-card__readmore">Читать статью →</div>\n                </div>\n            </a>"""
         all_cards.append((post_date, article_filename, card_html))
+        
     current_files = {c[1] for c in all_cards}
+    
     for post_file in existing_posts:
         basename = os.path.basename(post_file)
         if basename in current_files:
             continue
-        # Чистим fallback-фото из старого файла, если оно там есть
+            
         cleaned = clean_fallback_from_existing_post(post_file)
         if cleaned:
             print(f"  Очищен fallback: {basename}")
+            
         try:
             with open(post_file, 'r', encoding='utf-8') as f:
                 post_html = f.read()
             soup_post = BeautifulSoup(post_html, 'html.parser')
             time_tag = soup_post.find('time', datetime=True)
+            
             if time_tag:
                 try:
                     dt = datetime.fromisoformat(time_tag['datetime'])
@@ -359,23 +381,30 @@ def main() -> None:
                     post_date = time_tag.get_text(strip=True) or "01.01.2020"
             else:
                 post_date = "01.01.2020"
+                
             h1 = soup_post.find('h1', class_='article-title')
             title = h1.get_text(strip=True) if h1 else "Без названия"
             excerpt = extract_excerpt_from_html(post_html)
+            
             if not excerpt:
                 excerpt = "..."
+                
             existing_image = extract_image_from_html(post_html)
             image_block = ""
             if existing_image:
                 image_block = f'\n                <div class="article-card__image" style="background-image: url(\'{existing_image}\')"></div>'
+                
             card_html = f"""\n            <a href="{basename}" class="article-card">{image_block}\n                <div class="article-card__content">\n                    <div class="article-card__date">{post_date}</div>\n                    <h2 class="article-card__title">{title}</h2>\n                    <p class="article-card__excerpt">{excerpt}</p>\n                    <div class="article-card__readmore">Читать статью →</div>\n                </div>\n            </a>"""
             all_cards.append((post_date, basename, card_html))
+            
         except Exception as e:
             print(f"  Ошибка чтения {post_file}: {e}")
+            
     all_cards.sort(key=lambda x: datetime.strptime(x[0], "%d.%m.%Y") if len(x[0]) == 10 else datetime.now(), reverse=True)
     total_posts = len(all_cards)
     total_pages = max(1, (total_posts + POSTS_PER_PAGE - 1) // POSTS_PER_PAGE)
     print(f"Всего постов: {total_posts}, страниц: {total_pages}, новых: {new_posts_count}")
+    
     for page_num in range(1, total_pages + 1):
         start_idx = (page_num - 1) * POSTS_PER_PAGE
         end_idx = start_idx + POSTS_PER_PAGE
@@ -385,6 +414,7 @@ def main() -> None:
         with open(page_file, 'w', encoding='utf-8') as f:
             f.write(page_html)
         print(f"  Сгенерирована: {os.path.basename(page_file)} ({len(page_cards)} карточек)")
+        
     all_post_files = [c[1] for c in all_cards]
     generate_sitemap(all_post_files, total_pages)
     print(f"Успех: Обработано {total_posts} статей, создано {new_posts_count} новых!")
