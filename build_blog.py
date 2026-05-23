@@ -24,6 +24,7 @@ def is_valid_image_url(url: str | None) -> bool:
 
 def extract_image_url(msg) -> str | None:
     """Извлекает URL обложки из сообщения Telegram."""
+    # 1. Проверяем наличие прикрепленного фото
     photo_wrap = msg.find('a', class_='tgme_widget_message_photo_wrap')
     if photo_wrap:
         style = photo_wrap.get('style', '')
@@ -31,16 +32,16 @@ def extract_image_url(msg) -> str | None:
         if match:
             return match.group(1)
 
+    # 2. Ищем контентную картинку внутри самого текста
     text_div = msg.find('div', class_='tgme_widget_message_text')
     if text_div:
-        img = text_div.find('img')
-        if img:
-            return img.get('src')
+        for img in text_div.find_all('img'):
+            src = img.get('src', '')
+            # Жестко отсекаем эмодзи Telegram
+            if 'emoji' not in img.get('class', []) and '/emoji/' not in src:
+                return src
 
-    any_img = msg.find('img')
-    if any_img:
-        return any_img.get('src')
-
+    # Никаких глобальных fallback'ов, чтобы не схватить аватарку канала!
     return None
 
 def clean_text_div(text_div) -> None:
