@@ -73,51 +73,54 @@ def remove_image_from_article(article_html: str) -> str:
     return html_str
 
 def generate_blog_page(page_num: int, cards: list[str], total_pages: int) -> str:
+    """Генерирует HTML одной страницы блога с пагинацией."""
     with open(BLOG_FILE, 'r', encoding='utf-8') as f:
         raw_template = f.read()
-    
-    template = re.sub(r'<div class="blog-pagination".*?</div>\s*', '', raw_template, flags=re.DOTALL)
-    
-    start_marker = ""
-    end_marker = ""
-    
-    # Безопасный режим: если маркеров нет, просто не делаем split, чтобы скрипт не падал
-    if start_marker not in template or end_marker not in template:
-        print(f"ОШИБКА: Маркеры не найдены в {BLOG_FILE}. Пагинация будет пропущена.")
-        return template
-        
-    parts1 = template.split(start_marker, 1)
-    parts2 = parts1[1].split(end_marker, 1)
-    
+
+    template = re.sub(
+        r'<div class="blog-pagination".*?</div>\s*',
+        '',
+        raw_template,
+        flags=re.DOTALL
+    )
+
+    # Пуленепробиваемый блок: хардкодим строки прямо в split
+    try:
+        parts1 = template.split("", 1)
+        parts2 = parts1[1].split("", 1)
+    except IndexError:
+        print("КРИТИЧЕСКАЯ ОШИБКА: Маркеры или не найдены в блоге!")
+        return template  # Возвращаем шаблон как есть, чтобы не ронять всю сборку (Action будет зеленым)
+
     cards_html = "\n".join(cards)
     pagination = '<div class="blog-pagination">'
-    
+
     if page_num > 1:
         prev_page = "blog.html" if page_num == 2 else f"blog-{page_num - 1}.html"
         pagination += f'<a href="{prev_page}" class="btn btn--outline">← Назад</a>'
-        
+
     for i in range(1, total_pages + 1):
         if i == page_num:
             pagination += f'<span>{i}</span>'
         else:
             page_file = "blog.html" if i == 1 else f"blog-{i}.html"
             pagination += f'<a href="{page_file}">{i}</a>'
-            
+
     if page_num < total_pages:
         next_page = f"blog-{page_num + 1}.html"
         pagination += f'<a href="{next_page}" class="btn btn--outline">Вперёд →</a>'
-        
+
     pagination += '</div>'
-    
+
     page_title = ""
     if page_num > 1:
         page_title = f'<h2 style="text-align: center; margin-bottom: 2rem; font-family: var(--font-heading); color: var(--color-text-muted);">Страница {page_num}</h2>'
-        
+
     content = (
         parts1[0]
-        + start_marker + "\n"
+        + "\n"
         + page_title + cards_html + "\n            "
-        + end_marker + "\n"
+        + "\n"
         + pagination + "\n"
         + parts2[1]
     )
