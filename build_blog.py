@@ -82,7 +82,7 @@ def generate_blog_page(page_num: int, cards: list[str], total_pages: int) -> str
     end_marker = ""
     
     if start_marker not in template or end_marker not in template:
-        raise ValueError(f"КРИТИЧЕСКАЯ ОШИБКА: Маркеры {start_marker} или {end_marker} не найдены в файле blog.html! Проверьте, что они есть внутри <section class=\"blog-grid\">")
+        raise ValueError(f"КРИТИЧЕСКАЯ ОШИБКА: Маркеры {start_marker} или {end_marker} не найдены в файле blog.html!")
         
     # Жестко хардкодим строки разделителей, чтобы избежать ValueError: empty separator
     parts1 = template.split("", 1)
