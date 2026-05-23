@@ -111,8 +111,8 @@ def generate_blog_page(page_num: int, cards: list[str], total_pages: int) -> str
         raw_template,
         flags=re.DOTALL
     )
-    start_marker = "<!-- START ARTICLES -->"
-    end_marker = "<!-- END ARTICLES -->"
+    start_marker = ""
+    end_marker = ""
     if start_marker not in template or end_marker not in template:
         raise ValueError("Маркеры не найдены в blog.html")
     parts1 = template.split(start_marker, 1)
@@ -277,16 +277,35 @@ def main() -> None:
         else:
             post_date = datetime.now().strftime("%d.%m.%Y")
             post_date_iso = datetime.now().strftime("%Y-%m-%d")
+            
+        # Улучшенное извлечение заголовка (SEO H1 фикс)
         bold_tag = text_div.find(['b', 'strong'])
+        
         if bold_tag:
             title = bold_tag.get_text(strip=True)
             bold_tag.decompose()
         else:
-            raw_text_full = text_div.get_text(separator=' ')
-            sentences = raw_text_full.split('.')
-            title = sentences[0].strip() if sentences else "Без названия"
-            if len(title) > 150:
-                title = title[:150] + "..."
+            title = "Без названия"
+            # Ищем первую непустую текстовую ноду
+            for element in text_div.descendants:
+                if element.name is None and element.string and element.string.strip():
+                    full_text = element.string.strip()
+                    title = full_text.split('.')[0].strip()
+                    if len(title) > 120:
+                        title = title[:120] + "..."
+                    
+                    # Отсекаем текст заголовка из основного контента, чтобы избежать дубля под H1
+                    remaining_text = full_text.replace(title, '', 1).lstrip('. \n')
+                    element.replace_with(remaining_text)
+                    break
+                    
+        # Удаляем висячие переносы строк в начале контента (если они остались после удаления заголовка)
+        for child in list(text_div.children):
+            if child.name == 'br' or (child.name is None and not child.string.strip()):
+                child.extract()
+            else:
+                break
+                
         clean_text_div(text_div)
         image_url = extract_image_url(msg)
         post_link = msg.find('a', class_='tgme_widget_message_date')
