@@ -81,12 +81,13 @@ def generate_blog_page(page_num: int, cards: list[str], total_pages: int) -> str
     start_marker = ""
     end_marker = ""
     
+    # Безопасный режим: если маркеров нет, просто не делаем split, чтобы скрипт не падал
     if start_marker not in template or end_marker not in template:
-        raise ValueError(f"КРИТИЧЕСКАЯ ОШИБКА: Маркеры {start_marker} или {end_marker} не найдены в файле blog.html!")
+        print(f"ОШИБКА: Маркеры не найдены в {BLOG_FILE}. Пагинация будет пропущена.")
+        return template
         
-    # Жестко хардкодим строки разделителей, чтобы избежать ValueError: empty separator
-    parts1 = template.split("", 1)
-    parts2 = parts1[1].split("", 1)
+    parts1 = template.split(start_marker, 1)
+    parts2 = parts1[1].split(end_marker, 1)
     
     cards_html = "\n".join(cards)
     pagination = '<div class="blog-pagination">'
