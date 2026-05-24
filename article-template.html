@@ -170,6 +170,19 @@
             <p style="color: var(--color-text-light); margin-bottom: 1.5rem; font-size: 0.95rem;">Вы можете обсудить вашу ситуацию на индивидуальной онлайн-консультации.</p>
             <a href="index.html#contact" class="btn btn--primary" style="font-size: 0.85rem;">Записаться на встречу</a>
         </div>
+        <section class="section" style="background-color: var(--color-bg-alt); padding: 4rem 0; margin-top: 4rem;">
+            <div class="section__container">
+                <h2 style="text-align: center; font-family: var(--font-heading); font-size: 2.2rem; margin-bottom: 3rem;">Возможно, вас <em>заинтересует</em></h2>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+                    {{RANDOM_POSTS}}
+                </div>
+                
+                <div style="text-align: center; margin-top: 3rem;">
+                    <a href="blog.html" class="btn btn--outline">Смотреть все статьи</a>
+                </div>
+            </div>
+        </section>
     </main>
 
     <footer class="footer">
