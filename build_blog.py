@@ -2,6 +2,7 @@ import os
 import re
 import glob
 import requests
+import random
 from bs4 import BeautifulSoup
 from datetime import datetime
 
@@ -75,7 +76,6 @@ def remove_image_from_article(article_html: str) -> str:
     return html_str
 
 def generate_blog_page(page_num: int, cards: list[str], total_pages: int, raw_template: str) -> str:
-    # Используем собранные переменные
     parts1 = raw_template.split(MARKER_START, 1)
     if len(parts1) < 2:
         print("ВНИМАНИЕ: Маркер START ARTICLES не найден в шаблоне!")
@@ -349,6 +349,34 @@ def main() -> None:
         page_file = os.path.join(BASE_DIR, "blog.html" if page_num == 1 else f"blog-{page_num}.html")
         with open(page_file, 'w', encoding='utf-8') as f:
             f.write(page_html)
+            
+    # --- НОВЫЙ БЛОК: Внедрение случайных статей ---
+    print("Генерация блока 'Возможно, вас заинтересует' для всех статей...")
+    for date_str, filename, card_html in all_cards:
+        post_path = os.path.join(BASE_DIR, filename)
+        if not os.path.exists(post_path):
+            continue
+            
+        try:
+            with open(post_path, 'r', encoding='utf-8') as f:
+                html_content = f.read()
+                
+            if '{{RANDOM_POSTS}}' in html_content:
+                # Выбираем 3 случайные карточки, исключая текущую статью
+                other_cards = [c for c in all_cards if c[1] != filename]
+                random_selection = random.sample(other_cards, min(3, len(other_cards)))
+                
+                random_html = ""
+                for c in random_selection:
+                    random_html += c[2] + "\n"
+                    
+                html_content = html_content.replace('{{RANDOM_POSTS}}', random_html)
+                
+                with open(post_path, 'w', encoding='utf-8') as f:
+                    f.write(html_content)
+        except Exception as e:
+            print(f"  Ошибка при добавлении рекомендаций в {filename}: {e}")
+    # ----------------------------------------------
         
     all_post_files = [c[1] for c in all_cards]
     generate_sitemap(all_post_files, total_pages)
