@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Образование и дипломы | Наталья Баландина</title>
+    <meta name="description" content="Квалификация, дипломы и сертификаты специалиста. Высшее психологическое образование КГПУ, переподготовка ТГУ и специализация по ЛОРП в Институте им. Карвасарского.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://balandinatherapy.ru/education.html">
+
+    <!-- Фавиконы -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23FAF8F5%22/><text x=%2250%22 y=%2270%22 font-size=%2265%22 font-family=%22Georgia, serif%22 text-anchor=%22middle%22 fill=%22%237A8B6F%22>Н</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23FAF8F5%22/><text x=%2250%22 y=%2270%22 font-size=%2265%22 font-family=%22Georgia, serif%22 text-anchor=%22middle%22 fill=%22%237A8B6F%22>Н</text></svg>">
+
+    <!-- Шрифты -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        .education-page {
+            padding: 10rem 1.5rem 6rem;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        
+        .page-header {
+            text-align: center;
+            margin-bottom: 5rem;
+        }
+        
+        .page-title {
+            font-family: var(--font-heading);
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            color: var(--color-text);
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+        }
+        
+        .page-subtitle {
+            font-size: 1.1rem;
+            color: var(--color-text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* Сетка карточек образования */
+        .education-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 4rem;
+        }
+
+        .education-card {
+            background: var(--color-bg-alt);
+            border-radius: 16px;
+            padding: 3rem;
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 3rem;
+            align-items: center;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.02);
+            transition: var(--transition);
+        }
+
+        @media (max-width: 900px) {
+            .education-card {
+                grid-template-columns: 1fr;
+                padding: 2rem;
+                gap: 2rem;
+            }
+        }
+
+        .edu-badge {
+            display: inline-block;
+            padding: 0.4rem 1rem;
+            background: #fff;
+            border: 1px solid #e2ded8;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--color-accent);
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+        }
+
+        .edu-years {
+            font-size: 0.95rem;
+            color: var(--color-text-muted);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .edu-institution {
+            font-family: var(--font-heading);
+            font-size: 1.8rem;
+            line-height: 1.3;
+            color: var(--color-text);
+            margin-bottom: 1.5rem;
+        }
+
+        .edu-details {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .edu-details li {
+            font-size: 1.05rem;
+            line-height: 1.6;
+            margin-bottom: 0.75rem;
+            color: var(--color-text);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .edu-details span {
+            font-size: 0.85rem;
+            color: var(--color-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            margin-bottom: 0.15rem;
+        }
+
+        /* Контейнер для сканов дипломов */
+        .edu-visual {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            min-height: 280px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #fff;
+            border: 1px solid #e8e4de;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.04);
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .edu-visual:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+        }
+
+        .edu-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: filter 0.3s ease;
+        }
+
+        /* Модальное окно для детального просмотра сканов */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(26, 26, 25, 0.95);
+            backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            max-width: 90%;
+            max-height: 90vh;
+            object-fit: contain;
+            border-radius: 6px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 2.5rem;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .modal-close:hover {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Навигация -->
+    <nav class="nav" id="nav">
+        <a href="index.html" class="nav__logo">Наталья <span>Баландина</span></a>
+        <ul class="nav__links">
+            <li><a href="index.html#about">Обо мне</a></li>
+            <li><a href="index.html#services">Направления</a></li>
+            <li><a href="index.html#approach">Как я работаю</a></li>
+            <li><a href="index.html#pricing">Стоимость</a></li>
+            <li><a href="index.html#faq">Вопросы</a></li>
+            <li><a href="blog.html">Статьи</a></li>
+            <li><a href="index.html#contact" class="nav__cta">Записаться</a></li>
+        </ul>
+        <button class="nav__burger" id="burger" aria-label="Меню">
+            <span></span><span></span><span></span>
+        </button>
+    </nav>
+
+    <!-- Мобильное меню -->
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="index.html#about" onclick="closeMobile()">Обо мне</a>
+        <a href="index.html#services" onclick="closeMobile()">Направления</a>
+        <a href="index.html#approach" onclick="closeMobile()">Как я работаю</a>
+        <a href="index.html#pricing" onclick="closeMobile()">Стоимость</a>
+        <a href="index.html#faq" onclick="closeMobile()">Вопросы</a>
+        <a href="blog.html">Статьи</a>
+        <a href="index.html#contact" onclick="closeMobile()">Записаться</a>
+    </div>
+
+    <!-- Основной контент страницы -->
+    <main class="education-page">
+        <div class="page-header">
+            <h1 class="page-title">Образование и <em>квалификация</em></h1>
+            <p class="page-subtitle">Фундаментальная академическая подготовка и непрерывное углубление специализации для обеспечения безопасной и эффективной терапевтической практики.</p>
+        </div>
+
+        <div class="education-grid">
+            
+            <!-- Базовое высшее образование -->
+            <div class="education-card">
+                <div class="edu-info">
+                    <span class="edu-badge">Высшее образование</span>
+                    <div class="edu-years">2004 — 2009 гг.</div>
+                    <h2 class="edu-institution">Красноярский государственный педагогический университет им. В.П. Астафьева</h2>
+                    <ul class="edu-details">
+                        <li><span>Специальность</span>Педагогика и психология</li>
+                        <li><span>Квалификация</span>Педагог-психолог</li>
+                    </ul>
+                </div>
+                <div class="edu-visual" onclick="openModal('diploma-kgpu.jpg')">
+                    <img src="diploma-kgpu.jpg" alt="Диплом КГПУ им. Астафьева" class="edu-img" loading="lazy">
+                </div>
+            </div>
+
+            <!-- Профессиональная переподготовка ТГУ -->
+            <div class="education-card">
+                <div class="edu-info">
+                    <span class="edu-badge">Профессиональная переподготовка</span>
+                    <div class="edu-years">2024 г.</div>
+                    <h2 class="edu-institution">Национальный исследовательский Томский государственный университет</h2>
+                    <ul class="edu-details">
+                        <li><span>Программа обучения</span>Психолог-консультант: с нуля до первого клиента</li>
+                        <li><span>Сфера деятельности</span>Психологическое консультирование</li>
+                        <li><span>Объем программы</span>256 академических часов</li>
+                    </ul>
+                </div>
+                <div class="edu-visual" onclick="openModal('diploma-tsu.jpg')">
+                    <img src="diploma-tsu.jpg" alt="Диплом переподготовки ТГУ" class="edu-img" loading="lazy">
+                </div>
+            </div>
+
+            <!-- Специализация ЛОРП -->
+            <div class="education-card">
+                <div class="edu-info">
+                    <span class="edu-badge">Специализация и сертификация</span>
+                    <div class="edu-years">2026 г.</div>
+                    <h2 class="edu-institution">Институт психотерапии и медицинской психологии им. Б.Д. Карвасарского (ИПМП)</h2>
+                    <ul class="edu-details">
+                        <li><span>Направление</span>Личностно-ориентированная реконструктивная психотерапия</li>
+                        <li><span>Квалификационный уровень</span>Подготовка уровня ЛОРП-практик</li>
+                        <li><span>Объем программы</span>396 академических часов</li>
+                    </ul>
+                </div>
+                <div class="edu-visual" onclick="openModal('cert-lorp.jpg')">
+                    <img src="cert-lorp.jpg" alt="Сертификат ЛОРП ИПМП им. Карвасарского" class="edu-img" loading="lazy">
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Модальное окно просмотра -->
+    <div class="modal" id="imageModal" onclick="closeModal()">
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+        <img src="" alt="Увеличенный скан документа" class="modal-content" id="modalImg" onclick="event.stopPropagation()">
+    </div>
+
+    <!-- Футер -->
+    <footer class="footer">
+        <div class="footer__container">
+            <div class="footer__logo">Наталья Баландина</div>
+            <div class="footer__copy">© 2026 Все права защищены</div>
+            <div class="footer__socials">
+                <a href="https://t.me/NathalieBalandina" target="_blank" rel="noopener noreferrer" class="footer__social" aria-label="Написать лично в Telegram">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.216s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+                </a>
+                <a href="https://t.me/balandinatherapy" target="_blank" rel="noopener noreferrer" class="footer__social" aria-label="Telegram Канал">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.216s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Скрипты -->
+    <script>
+        const nav = document.getElementById('nav');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) { nav.classList.add('scrolled'); }
+            else { nav.classList.remove('scrolled'); }
+        });
+
+        const burger = document.getElementById('burger');
+        const mobileMenu = document.getElementById('mobileMenu');
+        burger.addEventListener('click', () => {
+            burger.classList.toggle('active');
+            mobileMenu.classList.toggle('active');
+            document.body.style.overflow = mobileMenu.classList.contains('active') ? 'hidden' : '';
+        });
+        function closeMobile() {
+            burger.classList.remove('active');
+            mobileMenu.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Логика интерактивного просмотра документов
+        const modal = document.getElementById('imageModal');
+        const modalImg = document.getElementById('modalImg');
+
+        function openModal(imgSrc) {
+            modal.classList.add('active');
+            modalImg.src = imgSrc;
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Закрытие по кнопке Esc
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+    </script>
+</body>
+</html>
