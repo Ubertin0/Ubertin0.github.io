@@ -334,3 +334,27 @@ body { font-family: var(--font-body); color: var(--color-text); background-color
         justify-content: center;
     }
 }
+
+/* =========================================
+   РАЗДЕЛ BLACK BOX (ТЕМНАЯ ТЕМА)
+   ========================================= */
+.section--blackbox {
+    background-color: #121212;
+    color: #f5f5f5;
+}
+
+/* Высветляем заголовок секции */
+.section--blackbox .section__title {
+    color: #ffffff;
+}
+
+/* Делаем полупрозрачным тег над заголовком */
+.section--blackbox .section__tag {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Если у тега есть боковые линии, делаем их тоже приглушенно-светлыми */
+.section--blackbox .section__tag::before,
+.section--blackbox .section__tag::after {
+    background-color: rgba(255, 255, 255, 0.15);
+}
