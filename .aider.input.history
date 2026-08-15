@@ -1,0 +1,35 @@
+
+# 2026-08-15 05:17:32.951610
++Y
+
+# 2026-08-15 05:17:52.375200
++n
+
+# 2026-08-15 05:18:31.052009
++Добавь плавающую кнопку-капсулу для нового проекта. Работай step-by-step.
++
++1. В файле style.css добавь в самый конец:
++Класс .floating-promo: position: fixed; bottom: 30px; right: 30px; background-color: var(--color-text); color: var(--color-bg); padding: 12px 24px; border-radius: 50px; display: flex; align-items: center; gap: 12px; text-decoration: none; box-shadow: 0 10px 30px rgba(0,0,0,0.15); z-index: 1000; transition: transform 0.3s ease. 
++При :hover добавь transform: translateY(-5px). 
++Медиазапрос для экранов меньше 768px: bottom: 20px; right: 20px; left: 20px; justify-content: center.
++
++2. В файлах index.html, blog.html и article-template.html добавь HTML-код прямо перед закрывающим тегом </body>:
++<a href="https://ronjina.ru/gruppa.html" target="_blank" rel="noopener noreferrer" class="floating-promo">
++  <span style="background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 20px; font-size: 0.75rem;">Новый проект</span>
++  <span style="font-family: var(--font-body); font-size: 0.95rem; font-weight: 500;">Группа межличностного опыта →</span>
++</a>
+
+# 2026-08-15 05:18:43.621840
++Y
+
+# 2026-08-15 05:18:49.487649
++A
+
+# 2026-08-15 05:19:10.636974
++Y
+
+# 2026-08-15 09:05:18.009364
++y
+
+# 2026-08-15 11:38:05.965736
++git diff

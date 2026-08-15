@@ -300,3 +300,37 @@ body { font-family: var(--font-body); color: var(--color-text); background-color
     }
 }
 
+/* =========================================
+   ПЛАВАЮЩАЯ ПРОМО-КАПСУЛА
+   ========================================= */
+.floating-promo {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background-color: var(--color-text);
+    color: var(--color-bg);
+    padding: 12px 24px;
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    z-index: 1000;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.floating-promo:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+}
+
+/* На мобильных центрируем и растягиваем внизу */
+@media (max-width: 768px) {
+    .floating-promo {
+        bottom: 20px;
+        right: 20px;
+        left: 20px;
+        justify-content: center;
+    }
+}
