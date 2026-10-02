@@ -9,6 +9,7 @@
     <meta name="keywords" content="русскоязычный психолог онлайн, психолог за рубежом, личный психолог, психологическое консультирование, психолог для экспатов, психолог для предпринимателей, Наталья Баландина, терапия тревоги, кризис эмиграции">
     <meta name="author" content="Наталья Баландина">
     <meta name="robots" content="index, follow">
+    <meta name="google-site-verification" content="MAnfw5ZSvj67NOD2Ppsb7CFIjR3wfPdfwjQoCdZPiZg">
     
     <meta property="og:title" content="Русскоязычный психолог онлайн | Наталья Баландина">
     <meta property="og:description" content="Глубокое психологическое онлайн-консультирование по всему миру. Конфиденциально.">
@@ -47,7 +48,9 @@
             clickmap:true,
             trackLinks:true,
             accurateTrackBounce:true,
-            webvisor:true
+            webvisor:true,
+            trackHash:true,
+            ecommerce:"dataLayer"
        });
     </script>
     <noscript><div><img src="https://mc.yandex.ru/watch/105466132" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
@@ -60,7 +63,10 @@
       gtag('config', 'G-YJT4GWX0QE');
     </script>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="preload" href="style.css" as="style">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -208,7 +214,7 @@
                         </div>
                         <h3 class="service-card__title">Депрессия и выгорание</h3>
                         <p class="service-card__text">
-                            Потеря смысла, апатия, emotional истощение. 
+                            Потеря смысла, апатия, эмоциональное истощение. 
                             Вместе найдём ресурсы для возвращения к полноценной жизни.
                         </p>
                     </div>
@@ -537,8 +543,8 @@
                             </div>
                             <button type="submit" class="btn btn--primary form__submit">Отправить заявку</button>
                             <p class="form__note">
-                                Нажимая кнопку, вы соглашаетесь с 
-                                <button type="button" class="form__policy-btn" id="openPolicy">политикой конфиденциальности</button>
+                                Нажимая кнопку, вы соглашаетесь с
+                                <a href="privacy.html" class="form__policy-btn" target="_blank">политикой конфиденциальности</a>
                             </p>
                         </form>
                     </div>
@@ -550,7 +556,7 @@
     <footer class="footer">
         <div class="footer__container">
             <div class="footer__logo">Наталья Баландина</div>
-            <div class="footer__copy">© 2026 Все права защищены</div>
+            <div class="footer__copy">© 2026 Все права защищены • <a href="privacy.html" style="color: inherit; text-decoration: none; border-bottom: 1px solid rgba(255,255,255,0.3);">Политика конфиденциальности</a></div>
             <div class="footer__socials">
                 <a href="https://t.me/NathalieBalandina" target="_blank" rel="noopener noreferrer" class="footer__social" aria-label="Написать лично в Telegram" title="Написать лично">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.216s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
@@ -567,35 +573,6 @@
             </div>
         </div>
     </footer>
-
-    <div class="modal" id="policyModal" role="dialog" aria-modal="true">
-        <div class="modal__overlay" id="policyOverlay"></div>
-        <div class="modal__content">
-            <button class="modal__close" id="closePolicy" aria-label="Закрыть">×</button>
-            <div class="modal__body">
-                <h2>Политика в отношении обработки персональных данных</h2>
-                <p>Настоящая Политика составлена в соответствии с требованиями Федерального закона от 27.07.2006. №152-ФЗ «О персональных данных» и определяет порядок обработки персональных данных и меры по обеспечению их безопасности.</p>
-                
-                <h3>1. Какие данные мы собираем</h3>
-                <p>При заполнении формы обратной связи на сайте мы собираем следующие данные, которые вы предоставляете добровольно: имя, номер телефона и/или адрес электронной почты, а также любую другую информацию, указанную вами в тексте сообщения.</p>
-                
-                <h3>2. Цели сбора данных</h3>
-                <p>Ваши персональные данные используются исключительно в следующих целях:<br>
-                — Обработка вашего запроса и предоставление обратной связи.<br>
-                — Организация и проведение психологических консультаций.<br>
-                — Информирование о деталях предстоящих встреч.</p>
-                
-                <h3>3. Хранение и передача данных</h3>
-                <p>Мы гарантируем сохранность ваших персональных данных. Данные не передаются третьим лицам ни при каких обстоятельствах, за исключением случаев, прямо предусмотренных действующим законодательством Российской Федерации. Доступ к персональным данным имеет только специалист (психолог), оказывающий услуги.</p>
-                
-                <h3>4. Ваше согласие</h3>
-                <p>Нажимая кнопку «Отправить заявку» (или аналогичную), вы даете свое согласие на обработку персональных данных в соответствии с настоящей Политикой. Согласие действует бессрочно до момента его отзыва вами путем направления соответствующего запроса.</p>
-                
-                <h3>5. Обратная связь</h3>
-                <p>По всем вопросам, связанным с обработкой персональных данных, вы можете связаться со мной по контактам, указанным на данном сайте.</p>
-            </div>
-        </div>
-    </div>
 
     <script>
         // Page Loader
@@ -665,15 +642,15 @@
         // Form handler (AJAX отправка через Formspree)
         async function handleSubmit(e) {
             e.preventDefault();
-            
+
             const form = e.target;
             const btn = form.querySelector('button[type="submit"]');
             const originalText = btn.textContent;
-            
+
             btn.textContent = 'Отправка...';
             btn.style.opacity = '0.7';
             btn.style.pointerEvents = 'none';
-            
+
             try {
                 const response = await fetch(form.action, {
                     method: form.method,
@@ -688,6 +665,18 @@
                     btn.style.background = '#5C6B52';
                     btn.style.opacity = '1';
                     form.reset();
+
+                    // Яндекс.Метрика цель
+                    if (typeof ym !== 'undefined') {
+                        ym(105466132, 'reachGoal', 'form_submit');
+                    }
+                    // Google Analytics событие
+                    if (typeof gtag !== 'undefined') {
+                        gtag('event', 'form_submission', {
+                            'event_category': 'contact',
+                            'event_label': 'consultation_request'
+                        });
+                    }
                 } else {
                     btn.textContent = 'Ошибка отправки';
                     btn.style.background = '#d9534f';
@@ -698,7 +687,7 @@
                 btn.style.background = '#d9534f';
                 btn.style.opacity = '1';
             }
-            
+
             setTimeout(() => {
                 btn.textContent = originalText;
                 btn.style.background = '';
@@ -707,30 +696,6 @@
         }
 
         // Modal Logic for Privacy Policy
-        const policyModal = document.getElementById('policyModal');
-        const openPolicyBtn = document.getElementById('openPolicy');
-        const closePolicyBtn = document.getElementById('closePolicy');
-        const policyOverlay = document.getElementById('policyOverlay');
-
-        function openModal() {
-            policyModal.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeModal() {
-            policyModal.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-
-        openPolicyBtn.addEventListener('click', openModal);
-        closePolicyBtn.addEventListener('click', closeModal);
-        policyOverlay.addEventListener('click', closeModal);
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && policyModal.classList.contains('active')) {
-                closeModal();
-            }
-        });
 
         // Smooth scroll for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -741,11 +706,32 @@
                     const offset = 80;
                     const position = target.getBoundingClientRect().top + window.scrollY - offset;
                     window.scrollTo({ top: position, behavior: 'smooth' });
+
+                    // Отслеживание кликов по CTA в Яндекс.Метрике
+                    if (this.classList.contains('btn--primary') || this.classList.contains('nav__cta')) {
+                        if (typeof ym !== 'undefined') {
+                            ym(105466132, 'reachGoal', 'cta_click');
+                        }
+                    }
                 }
             });
         });
     </script>
     <a href="#contact" class="floating-cta">Записаться</a>
+
+    <!-- Telegram Widget -->
+    <a href="https://t.me/NathalieBalandina"
+       class="telegram-floating-btn"
+       target="_blank"
+       rel="noopener noreferrer"
+       aria-label="Написать в Telegram"
+       onclick="if(typeof ym !== 'undefined') ym(105466132, 'reachGoal', 'telegram_click');">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.216s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+        </svg>
+        <span>Telegram</span>
+    </a>
+
         <!-- ПРОМО КАПСУЛА -->
         <a href="https://ronjina.ru/gruppa.html" target="_blank" rel="noopener noreferrer" class="floating-promo">
             <span style="background: rgba(255, 255, 255, 0.2); padding: 2px 8px; border-radius: 20px; font-size: 0.75rem;">Новый проект</span>

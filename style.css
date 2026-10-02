@@ -325,6 +325,40 @@ body { font-family: var(--font-body); color: var(--color-text); background-color
     box-shadow: 0 15px 35px rgba(0,0,0,0.2);
 }
 
+/* =========================================
+   TELEGRAM ПЛАВАЮЩАЯ КНОПКА
+   ========================================= */
+.telegram-floating-btn {
+    position: fixed;
+    bottom: 90px;
+    right: 30px;
+    z-index: 1000;
+    background: #0088cc;
+    color: white;
+    padding: 14px 24px;
+    border-radius: 50px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    font-weight: 500;
+    box-shadow: 0 8px 30px rgba(0, 136, 204, 0.35);
+    transition: all 0.3s ease;
+}
+
+.telegram-floating-btn:hover {
+    background: #006699;
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(0, 136, 204, 0.5);
+}
+
+.telegram-floating-btn svg {
+    width: 22px;
+    height: 22px;
+}
+
 /* На мобильных центрируем и растягиваем внизу */
 @media (max-width: 768px) {
     .floating-promo {
@@ -332,6 +366,21 @@ body { font-family: var(--font-body); color: var(--color-text); background-color
         right: 20px;
         left: 20px;
         justify-content: center;
+    }
+
+    .telegram-floating-btn {
+        bottom: auto;
+        top: 70px;
+        right: 20px;
+        padding: 10px;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        justify-content: center;
+    }
+
+    .telegram-floating-btn span {
+        display: none;
     }
 }
 
