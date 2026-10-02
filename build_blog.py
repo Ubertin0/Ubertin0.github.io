@@ -52,12 +52,32 @@ def strip_hashtags(text: str) -> str:
     return re.sub(r'#\w+', '', text)
 
 def generate_sitemap(posts: list[str], total_pages: int) -> None:
-    pages = ['index.html', 'blog.html'] + [f'blog-{i}.html' for i in range(2, total_pages + 1)]
+    from datetime import datetime
+    today = datetime.now().strftime('%Y-%m-%d')
+
     sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
-    for page in pages:
-        sitemap += f'  <url><loc>https://balandinatherapy.ru/{page}</loc><priority>0.8</priority></url>\n'
+
+    # Главная страница - самый высокий приоритет
+    sitemap += f'  <url>\n    <loc>https://balandinatherapy.ru/</loc>\n    <lastmod>{today}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>1.0</priority>\n  </url>\n'
+
+    # Важные статические страницы
+    static_pages = [
+        ('education.html', '0.8', 'monthly'),
+        ('privacy.html', '0.7', 'yearly'),
+    ]
+
+    for page, priority, changefreq in static_pages:
+        sitemap += f'  <url>\n    <loc>https://balandinatherapy.ru/{page}</loc>\n    <lastmod>{today}</lastmod>\n    <changefreq>{changefreq}</changefreq>\n    <priority>{priority}</priority>\n  </url>\n'
+
+    # Страницы блога
+    blog_pages = ['blog.html'] + [f'blog-{i}.html' for i in range(2, total_pages + 1)]
+    for page in blog_pages:
+        sitemap += f'  <url>\n    <loc>https://balandinatherapy.ru/{page}</loc>\n    <lastmod>{today}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.8</priority>\n  </url>\n'
+
+    # Статьи блога
     for post in posts:
-        sitemap += f'  <url><loc>https://balandinatherapy.ru/{post}</loc><priority>0.6</priority></url>\n'
+        sitemap += f'  <url>\n    <loc>https://balandinatherapy.ru/{post}</loc>\n    <lastmod>{today}</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>0.6</priority>\n  </url>\n'
+
     sitemap += '</urlset>\n'
     with open(os.path.join(BASE_DIR, 'sitemap.xml'), 'w', encoding='utf-8') as f:
         f.write(sitemap)
