@@ -197,6 +197,47 @@
             transform: scale(1.1);
         }
     </style>
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Наталья Баландина",
+    "jobTitle": "Психолог-консультант, ЛОРП-практик",
+    "url": "https://balandinatherapy.ru/education.html",
+    "image": "https://balandinatherapy.ru/photo.jpg",
+    "alumniOf": [
+        {
+            "@type": "EducationalOrganization",
+            "name": "Красноярский государственный педагогический университет им. В.П. Астафьева"
+        },
+        {
+            "@type": "EducationalOrganization",
+            "name": "Национальный исследовательский Томский государственный университет"
+        },
+        {
+            "@type": "EducationalOrganization",
+            "name": "Институт психотерапии и медицинской психологии им. Б.Д. Карвасарского"
+        }
+    ],
+    "hasCredential": [
+        {
+            "@type": "EducationalOccupationalCredential",
+            "credentialCategory": "degree",
+            "name": "Диплом о высшем образовании КГПУ им. В.П. Астафьева (2004–2009)"
+        },
+        {
+            "@type": "EducationalOccupationalCredential",
+            "credentialCategory": "degree",
+            "name": "Диплом о профессиональной переподготовке ТГУ (2024)"
+        },
+        {
+            "@type": "EducationalOccupationalCredential",
+            "credentialCategory": "certificate",
+            "name": "Удостоверение ЛОРП ИПМП им. Б.Д. Карвасарского (2026)"
+        }
+    ]
+}
+    </script>
 </head>
 <body>
 
@@ -207,8 +248,10 @@
             <li><a href="index.html#about">Обо мне</a></li>
             <li><a href="index.html#services">Направления</a></li>
             <li><a href="index.html#approach">Как я работаю</a></li>
+            <li><a href="index.html#groups">Группы</a></li>
             <li><a href="index.html#pricing">Стоимость</a></li>
             <li><a href="index.html#faq">Вопросы</a></li>
+            <li><a href="education.html" style="color: var(--color-primary); font-weight: 600;">Образование</a></li>
             <li><a href="blog.html">Статьи</a></li>
             <li><a href="index.html#contact" class="nav__cta">Записаться</a></li>
         </ul>
@@ -249,7 +292,7 @@
                     </ul>
                 </div>
                 <div class="edu-visual" onclick="openModal('diploma-kgpu.jpg')">
-                    <img src="diploma-kgpu.jpg" alt="Диплом КГПУ им. Астафьева" class="edu-img" loading="lazy">
+                    <img src="diploma-kgpu.jpg" alt="Диплом КГПУ им. В.П. Астафьева — высшее педагогическое и психологическое образование Натальи Баландиной (2004–2009 гг.)" class="edu-img" loading="lazy">
                 </div>
             </div>
 
@@ -266,7 +309,7 @@
                     </ul>
                 </div>
                 <div class="edu-visual" onclick="openModal('diploma-tsu.jpg')">
-                    <img src="diploma-tsu.jpg" alt="Диплом переподготовки ТГУ" class="edu-img" loading="lazy">
+                    <img src="diploma-tsu.jpg" alt="Диплом о профессиональной переподготовке Томского государственного университета по психологическому консультированию (2024 г.)" class="edu-img" loading="lazy">
                 </div>
             </div>
 
@@ -283,11 +326,22 @@
                     </ul>
                 </div>
                 <div class="edu-visual" onclick="openModal('cert-lorp.jpg')">
-                    <img src="cert-lorp.jpg" alt="Сертификат ЛОРП ИПМП им. Карвасарского" class="edu-img" loading="lazy">
+                    <img src="cert-lorp.jpg" alt="Удостоверение о повышении квалификации ИПМП им. Б.Д. Карвасарского по личностно-ориентированной реконструктивной психотерапии (ЛОРП, 2026 г.)" class="edu-img" loading="lazy">
                 </div>
             </div>
 
         </div>
+
+        <!-- CTA блок по п. 6 ТЗ -->
+        <section class="section" style="padding: 4rem 1.5rem; text-align: center; background: var(--color-bg-alt); margin-top: 3.5rem; border-radius: 16px;">
+            <div class="section__container reveal">
+                <h2 style="font-family: var(--font-heading); font-size: 2rem; margin-bottom: 1rem;">Готовы сделать первый шаг?</h2>
+                <p style="color: var(--color-text-light); max-width: 600px; margin: 0 auto 2rem; font-size: 1.05rem; line-height: 1.6;">
+                    Начните с бесплатного ознакомительного звонка на 15–20 минут, чтобы познакомиться и обсудить ваш запрос.
+                </p>
+                <a href="index.html#contact" class="btn btn--primary">Записаться на бесплатный звонок</a>
+            </div>
+        </section>
     </main>
 
     <!-- Модальное окно просмотра -->
