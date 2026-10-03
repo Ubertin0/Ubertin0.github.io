@@ -1,2 +1,10 @@
 venv/
 .aider*
+
+# Служебные отчеты и артефакты aider
+COMPLETED-TODAY.md
+DEPLOYMENT-SUCCESS.md
+IMPROVEMENTS.md
+SUMMARY.md
+google-verification-fix.md
+.aider*
