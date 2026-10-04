@@ -311,7 +311,7 @@ def main() -> None:
             
         image_block = ""
         if image_url:
-            image_block = f'\n                <div class="article-card__image" style="background-image: url(\'{image_url}\')"></div>'
+            image_block = f'\n                <div class="article-card__image" role="img" aria-label="Иллюстрация к статье: {title}" style="background-image: url(\'{image_url}\')"></div>'
             
         card_html = f"""\n            <a href="{article_filename}" class="article-card">{image_block}\n                <div class="article-card__content">\n                    <div class="article-card__date">{post_date}</div>\n                    <h2 class="article-card__title">{title}</h2>\n                    <p class="article-card__excerpt">...</p>\n                    <div class="article-card__readmore">Читать статью →</div>\n                </div>\n            </a>"""
         all_cards.append((post_date, article_filename, card_html))

@@ -889,12 +889,41 @@
         }
         // Modal Logic for Privacy Policy
 
+        
+        // Плавный скролл-параллакс для фото Hero (только на десктопе)
+        const heroPhoto = document.querySelector('.hero__photo-frame');
+        if (heroPhoto && window.innerWidth > 992) {
+            let ticking = false;
+            window.addEventListener('scroll', () => {
+                if (!ticking) {
+                    window.requestAnimationFrame(() => {
+                        const scrolled = window.scrollY;
+                        if (scrolled < 700) {
+                            heroPhoto.style.transform = `translate3d(0, ${scrolled * 0.12}px, 0)`;
+                        }
+                        ticking = false;
+                    });
+                    ticking = true;
+                }
+            });
+        }
+
         // Smooth scroll for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function(e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
+                const href = this.getAttribute('href');
+                if (!href) return;
+                
+                // Клик по логотипу (#) — плавный скролл на самый верх
+                if (href === "#") {
+                    e.preventDefault();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    return;
+                }
+
+                const target = document.querySelector(href);
                 if (target) {
+                    e.preventDefault();
                     const offset = 80;
                     const position = target.getBoundingClientRect().top + window.scrollY - offset;
                     window.scrollTo({ top: position, behavior: 'smooth' });
