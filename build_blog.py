@@ -309,7 +309,7 @@ def main() -> None:
                 f.write(article_html)
             new_posts_count += 1
             
-        image_block = ""
+        image_block = '<div class="article-card__image article-card__image--placeholder"></div>'
         if image_url:
             image_block = f'\n                <div class="article-card__image" role="img" aria-label="Иллюстрация к статье: {title}" style="background-image: url(\'{image_url}\')"></div>'
             
@@ -347,7 +347,7 @@ def main() -> None:
                 excerpt = "..."
                 
             existing_image = extract_image_from_html(post_html)
-            image_block = ""
+            image_block = '<div class="article-card__image article-card__image--placeholder"></div>'
             if existing_image:
                 image_block = f'\n                <div class="article-card__image" style="background-image: url(\'{existing_image}\')"></div>'
                 
