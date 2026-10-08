@@ -8,3 +8,6 @@ IMPROVEMENTS.md
 SUMMARY.md
 google-verification-fix.md
 .aider*
+
+__pycache__/
+*.pyc
