@@ -138,18 +138,18 @@ def generate_blog_page(page_num: int, cards: list[str], total_pages: int, raw_te
     
     if page_num > 1:
         prev_page = "blog.html" if page_num == 2 else f"blog-{page_num - 1}.html"
-        pagination += f'<a href="{prev_page}" class="btn btn--outline">← Назад</a>'
+        pagination += f'<a href="{prev_page}" class="pagination__nav">&larr; Назад</a>'
         
     for i in range(1, total_pages + 1):
         if i == page_num:
-            pagination += f'<span>{i}</span>'
+            pagination += f'<span class="pagination__num pagination__num--active">{i}</span>'
         else:
             page_file = "blog.html" if i == 1 else f"blog-{i}.html"
-            pagination += f'<a href="{page_file}">{i}</a>'
+            pagination += f'<a href="{page_file}" class="pagination__num">{i}</a>'
             
     if page_num < total_pages:
         next_page = f"blog-{page_num + 1}.html"
-        pagination += f'<a href="{next_page}" class="btn btn--outline">Вперёд →</a>'
+        pagination += f'<a href="{next_page}" class="pagination__nav">Вперёд &rarr;</a>'
         
     pagination += '</div>'
     

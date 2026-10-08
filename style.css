@@ -446,3 +446,68 @@ body { font-family: var(--font-body); color: var(--color-text); background-color
 .article-card:hover .article-card__image--placeholder::after {
     transform: scale(1.05);
 }
+
+/* =========================================
+   ПАГИНАЦИЯ БЛОГА (ПРЕМИАЛЬНЫЙ СТИЛЬ)
+   ========================================= */
+.blog-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin: 4.5rem auto 3rem;
+    flex-wrap: wrap;
+}
+.blog-pagination .pagination__num {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-decoration: none;
+    color: var(--color-text);
+    background: var(--color-white);
+    border: 1px solid var(--color-bg-dark);
+    transition: var(--transition);
+}
+.blog-pagination a.pagination__num:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(58, 53, 48, 0.08);
+}
+.blog-pagination .pagination__num--active {
+    background: var(--color-accent);
+    color: var(--color-white);
+    border-color: var(--color-accent);
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(122, 139, 111, 0.35);
+    pointer-events: none;
+}
+.blog-pagination .pagination__nav {
+    height: 42px;
+    padding: 0 1.4rem;
+    border-radius: 25px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+    color: var(--color-text);
+    background: var(--color-white);
+    border: 1px solid var(--color-bg-dark);
+    transition: var(--transition);
+}
+.blog-pagination .pagination__nav:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(58, 53, 48, 0.08);
+}
