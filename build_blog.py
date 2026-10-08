@@ -25,6 +25,33 @@ def is_valid_image_url(url: str | None) -> bool:
         return False
     return True
 
+def optimize_and_save_image(image_url: str | None, post_id: str) -> str | None:
+    if not image_url or not image_url.strip().startswith("http"):
+        return image_url
+    posts_dir = os.path.join(BASE_DIR, "images", "posts")
+    os.makedirs(posts_dir, exist_ok=True)
+    local_rel = f"images/posts/{post_id}.webp"
+    local_abs = os.path.join(BASE_DIR, local_rel)
+    if os.path.exists(local_abs) and os.path.getsize(local_abs) > 0:
+        return local_rel
+    try:
+        import io
+        import requests
+        from PIL import Image
+        resp = requests.get(image_url, timeout=12)
+        if resp.status_code == 200:
+            img = Image.open(io.BytesIO(resp.content))
+            if img.mode in ("RGBA", "P"):
+                img = img.convert("RGB")
+            if img.width > 1200:
+                h = int((1200 / img.width) * img.height)
+                img = img.resize((1200, h), Image.Resampling.LANCZOS)
+            img.save(local_abs, "WEBP", quality=82, method=6)
+            return local_rel
+    except Exception as err:
+        pass
+    return image_url
+
 def extract_image_url(msg) -> str | None:
     photo_wrap = msg.find('a', class_='tgme_widget_message_photo_wrap')
     if photo_wrap:
@@ -283,6 +310,7 @@ def main() -> None:
         image_url = extract_image_url(msg)
         post_link = msg.find('a', class_='tgme_widget_message_date')
         post_id = post_link['href'].split('/')[-1] if post_link else str(hash(text_div.get_text()))
+        image_url = optimize_and_save_image(image_url, post_id)
         article_filename = f"post-{post_id}.html"
         article_path = os.path.join(BASE_DIR, article_filename)
         
