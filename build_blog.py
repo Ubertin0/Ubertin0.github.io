@@ -344,6 +344,7 @@ def main() -> None:
             # Валидация JSON-LD и Open Graph при наличии кавычек в заголовке/описании
             article_html = re.sub(r'("headline":\s*)"(.*?)"(,\s*\n)', rf'\1"{safe_title_json}"\3', article_html)
             article_html = re.sub(r'("description":\s*)"(.*?)"(,\s*\n)', rf'\1"{safe_desc_json}"\3', article_html)
+            article_html = re.sub(r'("name":\s*)"(.*?)"(,\s*\n\s*"item":\s*"https://balandinatherapy\.ru/post-)', rf'\1"{safe_title_json}"\3', article_html)
             article_html = article_html.replace(f'content="{title} | Наталья Баландина"', f'content="{safe_title_attr} | Наталья Баландина"')
             article_html = article_html.replace(f'content="{excerpt}"', f'content="{safe_desc_attr}"')
             
