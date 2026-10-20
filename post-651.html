@@ -118,6 +118,32 @@
             color: var(--color-text-light);
         }
     </style>
+    <!-- Аналитика: Яндекс.Метрика и Google Analytics -->
+    <script type="text/javascript" >
+       (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+       m[i].l=1*new Date();
+       for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+       k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+       (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+       ym(105466132, "init", {
+            clickmap:true,
+            trackLinks:true,
+            accurateTrackBounce:true,
+            webvisor:true,
+            trackHash:true,
+            ecommerce:"dataLayer"
+       });
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/105466132" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-YJT4GWX0QE"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-YJT4GWX0QE');
+    </script>
 </head>
 <body>
 <nav class="nav" id="nav">
@@ -129,7 +155,9 @@
 <li><a href="index.html#groups">Группы</a></li>
 <li><a href="index.html#pricing">Стоимость</a></li>
 <li><a href="index.html#faq">Вопросы</a></li>
-<li><a href="blog.html">Статьи</a></li>
+<li><a href="education.html">Образование</a></li>
+            <li><a href="education.html" onclick="closeMobile()">Образование</a>
+        <a href="blog.html">Статьи</a></li>
 <li><a class="nav__cta" href="index.html#contact">Записаться</a></li>
 </ul>
 <button aria-label="Меню" class="nav__burger" id="burger">

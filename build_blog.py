@@ -3,6 +3,8 @@ import re
 import glob
 import requests
 import random
+import html
+import json
 from bs4 import BeautifulSoup
 from datetime import datetime
 
@@ -167,6 +169,12 @@ def generate_blog_page(page_num: int, cards: list[str], total_pages: int, raw_te
         + "\n            " + MARKER_END
         + parts2[1]
     )
+
+    cur_page_file = "blog.html" if page_num == 1 else f"blog-{page_num}.html"
+    content = content.replace(
+        'href="https://balandinatherapy.ru/blog.html"',
+        f'href="https://balandinatherapy.ru/{cur_page_file}"'
+    )
     return content
 
 def clean_fallback_from_existing_post(post_path: str) -> bool:
@@ -321,12 +329,23 @@ def main() -> None:
             raw_text = strip_hashtags(text_div.get_text(separator=' '))
             excerpt = raw_text[:140].strip() + ("..." if len(raw_text) > 140 else "")
             
+            safe_title_attr = html.escape(title, quote=True)
+            safe_desc_attr = html.escape(excerpt, quote=True)
+            safe_title_json = json.dumps(title, ensure_ascii=False)[1:-1]
+            safe_desc_json = json.dumps(excerpt, ensure_ascii=False)[1:-1]
+
             article_html = article_template.replace('{{TITLE}}', title)\
                                            .replace('{{DATE}}', post_date)\
                                            .replace('{{DATE_ISO}}', post_date_iso)\
                                            .replace('{{POST_ID}}', post_id)\
                                            .replace('{{META_DESC}}', excerpt)\
                                            .replace('{{CONTENT}}', content_html)
+
+            # Валидация JSON-LD и Open Graph при наличии кавычек в заголовке/описании
+            article_html = re.sub(r'("headline":\s*)"(.*?)"(,\s*\n)', rf'\1"{safe_title_json}"\3', article_html)
+            article_html = re.sub(r'("description":\s*)"(.*?)"(,\s*\n)', rf'\1"{safe_desc_json}"\3', article_html)
+            article_html = article_html.replace(f'content="{title} | Наталья Баландина"', f'content="{safe_title_attr} | Наталья Баландина"')
+            article_html = article_html.replace(f'content="{excerpt}"', f'content="{safe_desc_attr}"')
             
             if image_url:
                 article_html = article_html.replace('{{IMAGE}}', image_url)

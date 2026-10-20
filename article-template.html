@@ -124,6 +124,33 @@
             color: var(--color-text-light);
         }
     </style>
+
+    <!-- Аналитика: Яндекс.Метрика и Google Analytics -->
+    <script type="text/javascript" >
+       (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+       m[i].l=1*new Date();
+       for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+       k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+       (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+       ym(105466132, "init", {
+            clickmap:true,
+            trackLinks:true,
+            accurateTrackBounce:true,
+            webvisor:true,
+            trackHash:true,
+            ecommerce:"dataLayer"
+       });
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/105466132" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-YJT4GWX0QE"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-YJT4GWX0QE');
+    </script>
 </head>
 <body>
 
@@ -136,6 +163,7 @@
             <li><a href="index.html#groups">Группы</a></li>
             <li><a href="index.html#pricing">Стоимость</a></li>
             <li><a href="index.html#faq">Вопросы</a></li>
+            <li><a href="education.html">Образование</a></li>
             <li><a href="blog.html">Статьи</a></li>
             <li><a href="index.html#contact" class="nav__cta">Записаться</a></li>
         </ul>
@@ -148,8 +176,10 @@
         <a href="index.html#about" onclick="closeMobile()">Обо мне</a>
         <a href="index.html#services" onclick="closeMobile()">Направления</a>
         <a href="index.html#approach" onclick="closeMobile()">Как я работаю</a>
+        <a href="index.html#groups" onclick="closeMobile()">Группы</a>
         <a href="index.html#pricing" onclick="closeMobile()">Стоимость</a>
         <a href="index.html#faq" onclick="closeMobile()">Вопросы</a>
+        <a href="education.html" onclick="closeMobile()">Образование</a>
         <a href="blog.html">Статьи</a>
         <a href="index.html#contact" onclick="closeMobile()">Записаться</a>
     </div>
@@ -234,8 +264,5 @@
     </script>
     <a href="index.html#contact" class="floating-cta">Записаться</a>
     <!-- ПРОМО КАПСУЛА -->
-        <span style="background: rgba(255, 255, 255, 0.2); padding: 2px 8px; border-radius: 20px; font-size: 0.75rem;">Новый проект</span>
-        <span style="font-family: var(--font-body); font-size: 0.95rem; font-weight: 500;">Группа межличностного опыта &rarr;</span>
-    </a>
 </body>
 </html>
