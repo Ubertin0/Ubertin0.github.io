@@ -77,6 +77,18 @@
             "priceCurrency": "RUB",
             "availability": "https://schema.org/InStock",
             "url": "https://balandinatherapy.ru/#pricing"
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Кризисная встреча или сопровождение",
+              "description": "60 минут онлайн. Приоритетное время встречи при остром кризисе либо индивидуальное сопровождение с поддержкой в мессенджерах."
+            },
+            "price": "7000",
+            "priceCurrency": "RUB",
+            "availability": "https://schema.org/InStock",
+            "url": "https://balandinatherapy.ru/#pricing"
           }
         ]
       }
@@ -242,7 +254,7 @@
                         <a href="#contact" class="btn btn--primary">Записаться на бесплатный звонок</a>
                         <a href="#about" class="btn btn--outline">Узнать больше</a>
                     </div>
-                    <div class="hero__stats">
+                    <div class="hero__stats" style="gap: 2rem; flex-wrap: wrap;">
                         <div>
                             <div class="hero__stat-number">19 лет</div>
                             <div class="hero__stat-label">в помогающих профессиях</div>
@@ -250,6 +262,10 @@
                         <div>
                             <div class="hero__stat-number">ЛОРП</div>
                             <div class="hero__stat-label">клиническая школа им. Карвасарского</div>
+                        </div>
+                        <div>
+                            <div class="hero__stat-number">350+</div>
+                            <div class="hero__stat-label">человек в управлении (5 лет в кризисных системах)</div>
                         </div>
                         <div>
                             <div class="hero__stat-number">15–20 мин</div>
@@ -290,6 +306,11 @@
                             Я работаю в методе <strong>личностно-ориентированной (реконструктивной) психотерапии (ЛОРП)</strong> Санкт-Петербургской школы им. В.М. Бехтерева. Для меня терапия — это живой контакт двух взрослых людей, в котором мы исследуем, почему в вашей жизни повторяются одни и те же тупики и как перестроить внутреннюю систему. Мы не ищем виноватых и не ломаем ваш характер, а находим устойчивые опоры, чтобы вернуть в жизнь тепло, спокойствие и свободу.
                         </p>
 
+                        <div style="background: var(--color-white); border-left: 3px solid var(--color-accent); padding: 1.2rem 1.5rem; border-radius: 8px; margin: 1.5rem 0; font-size: 0.92rem; color: var(--color-text-light); line-height: 1.7;">
+                            <strong style="color: var(--color-text); display: block; margin-bottom: 0.3rem;">Важное правило моей практики: не существует иерархии страданий</strong>
+                            Работа в системах, где на кону стояли жизни, научила меня главному: если вам больно, страшно или пусто внутри — для вашей психики это всегда настоящая авария, независимо от того, руководите ли вы предприятием, воспитываете ребенка или пытаетесь пережить кризис в семье.
+                        </div>
+
                         <div class="about__credentials">
                             <div class="about__credential">
                                 <svg class="about__credential-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
@@ -301,7 +322,7 @@
                             </div>
                             <div class="about__credential">
                                 <svg class="about__credential-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                                <div><strong>Клиническая школа ЛОРП (ИПМП им. Б.Д. Карвасарского):</strong> научно доказанный метод глубинной реконструкции личности и отношений без эзотерики и пустых иллюзий.</div>
+                                <div><strong>Клиническая школа ЛОРП и семейная терапия:</strong> научно доказанный метод глубокой реконструкции личности (ИПМП им. Б.Д. Карвасарского) и специализация по семейному консультированию пар (МИНИИ «СОВА»).</div>
                             </div>
                             <div class="about__credential">
                                 <svg class="about__credential-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
@@ -331,37 +352,52 @@
                         </div>
                         <h3 class="service-card__title">Тревожные и невротические состояния</h3>
                         <p class="service-card__text">
-                            Повышенная тревожность и постоянное внутреннее напряжение; панические атаки; страхи и фобии; навязчивые мысли и действия; трудности с расслаблением и отдыхом; психосоматические проявления; нарушения сна, связанные с психологическими причинами.
+                            Повышенная тревожность и постоянное внутреннее напряжение; панические атаки; страхи и фобии; навязчивые мысли и действия; трудности с расслаблением и отдыхом; психосоматические проявления; нарушения сна.
                         </p>
+                        <div style="margin-top: 1.2rem; background: var(--color-bg-alt); padding: 1rem 1.2rem; border-radius: 8px; border-left: 3px solid var(--color-accent); font-size: 0.88rem; color: var(--color-text); line-height: 1.6;">
+                            <strong>Почему со мной надежно:</strong> когда внутри всё сжимается от паники, советы «подышать» не работают. Опыт работы в реальных кризисных системах научил меня не заражаться чужой тревогой: пока вас штормит, моя устойчивость — ваша внешняя опора, а клинический метод ЛОРП помогает отключить внутренний источник напряжения.
+                        </div>
                     </div>
+
                     <div class="service-card reveal">
                         <div class="service-card__icon">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
                         </div>
-                        <h3 class="service-card__title">Отношения с собой и другими</h3>
+                        <h3 class="service-card__title">Отношения и семья: кризисы в паре</h3>
                         <p class="service-card__text">
-                            Трудности с близостью и доверием; страх отвержения; зависимость от оценки и одобрения; ревность; сложности с личными границами; повторяющиеся конфликты; трудности в отношениях с партнёром; переживание расставания; сложные отношения с родителями; трудности в роли родителя.
+                            Трудности с близостью и доверием; охлаждение и глухая оборона в паре; страх быть отвергнутым; зависимость от чужого одобрения; ревность; повторяющиеся конфликты; болезненное расставание; сложные отношения с родителями и детьми.
                         </p>
-                    </div>
-                    <div class="service-card reveal">
-                        <div class="service-card__icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+                        <div style="margin-top: 1.2rem; background: var(--color-bg-alt); padding: 1rem 1.2rem; border-radius: 8px; border-left: 3px solid var(--color-accent); font-size: 0.88rem; color: var(--color-text); line-height: 1.6;">
+                            <strong>Почему со мной надежно:</strong> семья — это живая система, которая дает сбой при сверхконтроле или страхе уязвимости. Понимание архитектуры отношений по В.Н. Мясищеву и специализированная подготовка по семейной терапии (200 ч.) помогают вернуть в пару живой контакт вместо взаимных претензий.
                         </div>
-                        <h3 class="service-card__title">Личностные и жизненные кризисы</h3>
-                        <p class="service-card__text">
-                            Переживание горя и утраты (смерть близкого, потеря отношений, здоровья, привычного образа жизни); ощущение, что потерялось понимание, чего я хочу; внутренние конфликты и противоречия; сложности с выбором и принятием решений; кризисы смысла; повторяющиеся жизненные сценарии; переезд и эмиграция.
-                        </p>
                     </div>
+
                     <div class="service-card reveal">
                         <div class="service-card__icon">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
                         </div>
-                        <h3 class="service-card__title">Работа и профессиональная жизнь</h3>
+                        <h3 class="service-card__title">Истощение, выгорание и сверхконтроль</h3>
                         <p class="service-card__text">
-                            Выгорание и хроническое напряжение; трудности с ответственностью и контролем; страх ошибок и неудачи; сложности с делегированием; конфликты с коллегами и руководством; профессиональные кризисы.
+                            Синдром «тащу всё на себе»; вина за любой «бесполезный» час отдыха; страх совершить ошибку; трудности с делегированием; профессиональные тупики; хроническая усталость, которая не проходит после отпуска.
                         </p>
-                        <div style="margin-top: 1.2rem;">
-                            <a href="#leaders" style="color: var(--color-primary); font-weight: 500; font-size: 0.95rem; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">Подробнее для руководителей &rarr;</a>
+                        <div style="margin-top: 1.2rem; background: var(--color-bg-alt); padding: 1rem 1.2rem; border-radius: 8px; border-left: 3px solid var(--color-accent); font-size: 0.88rem; color: var(--color-text); line-height: 1.6;">
+                            <strong>Почему со мной надежно:</strong> выгорают не от количества задач, а от жесткого внутреннего надсмотрщика. Мне не нужно объяснять, каково это — годами жить в режиме «я обязан справляться». Мы перестроим внутреннюю конструкцию так, чтобы сохранить результаты, но перестать сжигать себя.
+                        </div>
+                        <div style="margin-top: 1rem;">
+                            <a href="#leaders" style="color: var(--color-primary); font-weight: 500; font-size: 0.92rem; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">О грузе высокой ответственности &rarr;</a>
+                        </div>
+                    </div>
+
+                    <div class="service-card reveal">
+                        <div class="service-card__icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+                        </div>
+                        <h3 class="service-card__title">Личностные кризисы и жизненные переходы</h3>
+                        <p class="service-card__text">
+                            Ощущение «живу не свою жизнь»; потеря смыслов и ориентиров; проживание горя и утраты; сложности с выбором и принятием решений; адаптация при переезде и эмиграции; повторяющиеся тупиковые сценарии.
+                        </p>
+                        <div style="margin-top: 1.2rem; background: var(--color-bg-alt); padding: 1rem 1.2rem; border-radius: 8px; border-left: 3px solid var(--color-accent); font-size: 0.88rem; color: var(--color-text); line-height: 1.6;">
+                            <strong>Почему со мной надежно:</strong> когда годами строишь правильную, функциональную жизнь из слова «надо», однажды перестаешь слышать «хочу». Мы исследуем этот кризис не как поломку, а как честный переход к вашей собственной взрослой жизни.
                         </div>
                     </div>
                 </div>
@@ -381,52 +417,42 @@
                 <section class="section approach" id="approach">
             <div class="section__container">
                 <div class="section__header reveal">
-                    <div class="section__tag">Как я работаю</div>
-                    <h2 class="section__title">Как я <em>работаю</em></h2>
+                    <div class="section__tag">Метод работы</div>
+                    <h2 class="section__title">Как работает метод <em>ЛОРП</em></h2>
+                    <p class="section__desc">
+                        Почему «просто всё понимать головой» недостаточно — и как устроена глубинная реконструкция личности в Санкт-Петербургской школе им. В.М. Бехтерева
+                    </p>
                 </div>
 
-                <div class="reveal" style="max-width: 820px; margin: 0 auto 3.5rem; line-height: 1.8; color: var(--color-text-light); font-size: 1.05rem;">
-                    <p style="margin-bottom: 1.2rem;">
-                        Мне интересно смотреть на вашу жизнь через ваше собственное окно, а не через свою рамку правильности. У каждого человека есть своя логика, по которой он строит свои трудности. Обычно она вполне последовательна, просто изнутри её трудно увидеть.
-                    </p>
-                    <p style="margin-bottom: 1.2rem;">
-                        Я обращаю внимание на связи и повторения: как одна и та же история возникает в разных отношениях и обстоятельствах. Работа, отношения, семья, собственные решения — декорации меняются, а привычный способ взаимодействовать с собой и миром может оставаться тем же.
-                    </p>
-                    <p style="margin-bottom: 1.2rem;">
-                        Мне важен сам контакт между нами. Это не попытка «анализировать вас по поведению»: отношения клиента и психолога — часть психотерапевтической работы. Именно в живом контакте часто становится видно то, что трудно заметить, просто рассказывая о себе.
-                    </p>
+                <div class="reveal" style="max-width: 820px; margin: 0 auto 3.5rem; line-height: 1.8; color: var(--color-text-light); font-size: 1.05rem; text-align: center;">
                     <p>
-                        Я не стремлюсь подгонять человека под заранее известную норму. Мне интереснее понять, почему именно такой способ жить когда-то стал для вас необходимым и что происходит сейчас, когда он перестаёт работать.
+                        Ко мне часто приходят взрослые, думающие люди, которые уже прочитали десятки книг, знают свои детские сценарии и всё про себя понимают — но продолжают тревожиться и наступать на те же грабли. Устойчивые изменения происходят тогда, когда терапия затрагивает не только логику, а работает сразу на трех этажах психики:
                     </p>
                 </div>
 
-                <div class="approach__steps">
+                <div class="approach__steps" style="grid-template-columns: repeat(3, 1fr);">
                     <div class="approach__step reveal">
                         <div class="approach__step-number">01</div>
-                        <h3 class="approach__step-title">Ознакомительный звонок</h3>
+                        <div style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--color-accent); margin-bottom: 0.4rem;">Уровень понимания</div>
+                        <h3 class="approach__step-title">Увидеть скрытый чертеж</h3>
                         <p class="approach__step-text">
-                            15–20 минут онлайн, бесплатно. Коротко обсудим ваш запрос и организационные вопросы и поймём, подходит ли вам мой способ работы.
+                            Вместо борьбы со следствиями мы находим корневое противоречие: какие именно негласные правила («я не имею права на ошибку», «близость опасна», «я должен всё тащить сам») заставляют вашу психику включать тревогу или апатию как аварийный тормоз.
                         </p>
                     </div>
                     <div class="approach__step reveal">
                         <div class="approach__step-number">02</div>
-                        <h3 class="approach__step-title">Первые встречи</h3>
+                        <div style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--color-accent); margin-bottom: 0.4rem;">Эмоциональный уровень</div>
+                        <h3 class="approach__step-title">Прожить новый опыт в контакте</h3>
                         <p class="approach__step-text">
-                            Знакомимся с вашим запросом и тем, как он устроен в вашей жизни.
+                            Привычные защиты не меняются от лекций — они трансформируются только в живых отношениях. В безопасном контакте с терапевтом вы впервые получаете опыт того, что можно быть живым, несогласным или уязвимым — и мир от этого не рушится.
                         </p>
                     </div>
                     <div class="approach__step reveal">
                         <div class="approach__step-number">03</div>
-                        <h3 class="approach__step-title">Совместная работа</h3>
+                        <div style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--color-accent); margin-bottom: 0.4rem;">Поведенческий уровень</div>
+                        <h3 class="approach__step-title">Действовать иначе в жизни</h3>
                         <p class="approach__step-text">
-                            Регулярные встречи, на которых мы исследуем повторяющиеся связи и ваши способы переживать и взаимодействовать с другими.
-                        </p>
-                    </div>
-                    <div class="approach__step reveal">
-                        <div class="approach__step-number">04</div>
-                        <h3 class="approach__step-title">Завершение</h3>
-                        <p class="approach__step-text">
-                            Подводим итоги, закрепляем изменения и обсуждаем, как двигаться дальше самостоятельно.
+                            Мы переносим новую внутреннюю устойчивость в вашу реальную жизнь: в то, как вы выстраиваете границы на работе, разговариваете с партнером, принимаете решения и позволяете себе отдыхать без фонового чувства вины.
                         </p>
                     </div>
                 </div>
@@ -524,46 +550,62 @@
                     </div>
                 </div>
 
-                <div class="pricing__grid" style="max-width: 480px; margin: 0 auto; grid-template-columns: 1fr;">
-                    <!-- Основная карточка онлайн-консультации по ТЗ -->
-                    <div class="pricing-card pricing-card--featured reveal">
-                        <h3 class="pricing-card__type">Индивидуальная онлайн-консультация психолога</h3>
-                        <p class="pricing-card__duration">60 минут • Zoom, Контур Толк, Яндекс Телемост</p>
-                        <div class="pricing-card__price">
-                            5 000 <small>₽</small>
+                <div class="pricing__grid">
+                    <!-- Карточка 1: Ознакомительный звонок -->
+                    <div class="pricing-card reveal">
+                        <div>
+                            <div style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--color-accent); margin-bottom: 0.5rem;">Первый шаг</div>
+                            <h3 class="pricing-card__type">Ознакомительный звонок</h3>
+                            <p class="pricing-card__duration">15–20 минут • Zoom, Контур Толк, Телемост</p>
+                            <div class="pricing-card__price">
+                                0 <small>₽ / Бесплатно</small>
+                            </div>
                         </div>
                         <ul class="pricing-card__features">
-                            <li>Прием ведет квалифицированный психолог, ЛОРП-практик</li>
-                            <li>Полная конфиденциальность</li>
-                            <li>Оплата картами РФ и СБП, для клиентов за рубежом — индивидуальные условия (уточняйте в мессенджерах)</li>
+                            <li>Короткое онлайн-знакомство</li>
+                            <li>Обсудим ваш запрос и формат работы</li>
+                            <li>Поймем, комфортно ли вам в живом контакте</li>
+                            <li>Без каких-либо финансовых обязательств</li>
                         </ul>
-                        <a href="#contact" class="btn btn--primary">Записаться</a>
+                        <a href="#contact" class="btn btn--outline">Выбрать время звонка</a>
                     </div>
 
-                    <!-- Скрытые тарифы (сохранены в коде по Q2 ТЗ) -->
-                    <div class="pricing-card" style="display: none;" aria-hidden="true">
-                        <h3 class="pricing-card__type">Кризисная онлайн консультация</h3>
-                        <p class="pricing-card__duration">60 минут • Zoom, Контур Толк, Яндекс Телемост</p>
-                        <div class="pricing-card__price">7 000 <small>₽</small></div>
+                    <!-- Карточка 2: Основной формат (Featured) -->
+                    <div class="pricing-card pricing-card--featured reveal">
+                        <div>
+                            <div style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--color-accent); margin-bottom: 0.5rem;">Основной формат</div>
+                            <h3 class="pricing-card__type">Индивидуальная онлайн-сессия</h3>
+                            <p class="pricing-card__duration">60 минут • Zoom, Контур Толк, Телемост</p>
+                            <div class="pricing-card__price">
+                                5 000 <small>₽</small>
+                            </div>
+                        </div>
                         <ul class="pricing-card__features">
-                            <li>Экстренная онлайн-встреча</li>
-                            <li>Индивидуальная работа</li>
-                            <li>Незапланированное, удобное для Вас время</li>
-                            <li>Полная конфиденциальность</li>
+                            <li>Прием ведет сертифицированный ЛОРП-практик</li>
+                            <li>Глубинная реконструктивная работа с причиной</li>
+                            <li>Полная конфиденциальность и этика</li>
+                            <li>Оплата картами РФ, СБП и для клиентов за рубежом</li>
                         </ul>
-                        <a href="#contact" class="btn btn--outline">Записаться</a>
+                        <a href="#contact" class="btn btn--primary">Записаться на сессию</a>
                     </div>
 
-                    <div class="pricing-card" style="display: none;" aria-hidden="true">
-                        <h3 class="pricing-card__type">Индивидуальное сопровождение</h3>
-                        <p class="pricing-card__duration">60 минут • Zoom, Контур Толк, Яндекс Телемост</p>
-                        <div class="pricing-card__price">7 000 <small>₽</small></div>
+                    <!-- Карточка 3: Кризисный / Приоритетный формат -->
+                    <div class="pricing-card reveal">
+                        <div>
+                            <div style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--color-accent); margin-bottom: 0.5rem;">Приоритетный формат</div>
+                            <h3 class="pricing-card__type">Кризисная встреча или сопровождение</h3>
+                            <p class="pricing-card__duration">60 минут • Приоритетный график</p>
+                            <div class="pricing-card__price">
+                                7 000 <small>₽</small>
+                            </div>
+                        </div>
                         <ul class="pricing-card__features">
-                            <li>Работа абсолютно анонимно</li>
-                            <li>Решение деликатных вопросов</li>
+                            <li>Внеплановая встреча в удобное время при остром кризисе</li>
+                            <li>Индивидуальная работа при тяжелом состоянии</li>
                             <li>Приоритетная связь в мессенджерах между сессиями</li>
+                            <li>Полная конфиденциальность</li>
                         </ul>
-                        <a href="#contact" class="btn btn--outline">Записаться</a>
+                        <a href="#contact" class="btn btn--outline">Связаться напрямую</a>
                     </div>
                 </div>
 
