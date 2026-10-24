@@ -61,7 +61,7 @@ def get_gemini_models_list() -> list:
         try:
             resp = requests.get(
                 url,
-                headers={"x-goog-api-key": GEMINI_API_KEY, "Content-Type": "application/json"},
+                headers={"Content-Type": "application/json"},
                 timeout=15
             )
             if resp.status_code == 200:
@@ -75,7 +75,15 @@ def get_gemini_models_list() -> list:
                             found.append(m_name)
                 if found:
                     print(f"  [AI SEO] Доступные модели Gemini для вашего ключа: {found}")
-                    preferred = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-flash-latest", "gemini-pro"]
+                    preferred = [
+                        "gemini-flash-latest",
+                        "gemini-2.5-flash",
+                        "gemini-3.8-flash",
+                        "gemini-3.5-flash",
+                        "gemini-2.5-flash-lite",
+                        "gemini-3.1-flash-lite",
+                        "gemini-pro-latest"
+                    ]
                     ordered = [m for m in preferred if m in found]
                     ordered += [m for m in found if "flash" in m.lower() and m not in ordered]
                     ordered += [m for m in found if m not in ordered]
@@ -88,7 +96,7 @@ def get_gemini_models_list() -> list:
         except Exception as e:
             print(f"  [AI SEO] Ошибка проверки моделей: {e}")
 
-    _DISCOVERED_MODELS = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-flash-latest"]
+    _DISCOVERED_MODELS = ["gemini-flash-latest", "gemini-2.5-flash", "gemini-3.8-flash", "gemini-3.5-flash"]
     return _DISCOVERED_MODELS
 
 def get_seo_for_post(post_id: str, title: str, text: str, cache: dict) -> dict:
@@ -140,7 +148,7 @@ def get_seo_for_post(post_id: str, title: str, text: str, cache: dict) -> dict:
                 resp = requests.post(
                     api_url,
                     json=payload,
-                    headers={"x-goog-api-key": GEMINI_API_KEY, "Content-Type": "application/json"},
+                    headers={"Content-Type": "application/json"},
                     timeout=25
                 )
                 if resp.status_code == 200:
