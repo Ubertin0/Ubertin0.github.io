@@ -76,11 +76,10 @@ def get_gemini_models_list() -> list:
                 if found:
                     print(f"  [AI SEO] Доступные модели Gemini для вашего ключа: {found}")
                     preferred = [
-                        "gemini-flash-latest",
-                        "gemini-2.5-flash",
-                        "gemini-3.8-flash",
                         "gemini-3.5-flash",
-                        "gemini-2.5-flash-lite",
+                        "gemini-3.8-flash",
+                        "gemini-3.5-flash-lite",
+                        "gemini-flash-latest",
                         "gemini-3.1-flash-lite",
                         "gemini-pro-latest"
                     ]
@@ -96,7 +95,7 @@ def get_gemini_models_list() -> list:
         except Exception as e:
             print(f"  [AI SEO] Ошибка проверки моделей: {e}")
 
-    _DISCOVERED_MODELS = ["gemini-flash-latest", "gemini-2.5-flash", "gemini-3.8-flash", "gemini-3.5-flash"]
+    _DISCOVERED_MODELS = ["gemini-3.5-flash", "gemini-3.8-flash", "gemini-3.5-flash-lite", "gemini-flash-latest"]
     return _DISCOVERED_MODELS
 
 def get_seo_for_post(post_id: str, title: str, text: str, cache: dict) -> dict:
@@ -149,7 +148,7 @@ def get_seo_for_post(post_id: str, title: str, text: str, cache: dict) -> dict:
                     api_url,
                     json=payload,
                     headers={"Content-Type": "application/json"},
-                    timeout=25
+                    timeout=40
                 )
                 if resp.status_code == 200:
                     result = resp.json()
