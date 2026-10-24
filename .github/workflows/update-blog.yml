@@ -31,6 +31,7 @@ jobs:
           python build_blog.py
         env:
           PYTHONUNBUFFERED: 1
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
 
       - name: Commit and push
         run: |

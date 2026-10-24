@@ -5,6 +5,7 @@ import requests
 import random
 import html
 import json
+import time
 from bs4 import BeautifulSoup
 from datetime import datetime
 
@@ -13,12 +14,179 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CHANNEL_URL = "https://t.me/s/balandinatherapy"
 TEMPLATE_FILE = os.path.join(BASE_DIR, "article-template.html")
 BLOG_FILE = os.path.join(BASE_DIR, "blog.html")
+SEO_CACHE_FILE = os.path.join(BASE_DIR, "seo_cache.json")
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "").strip()
 POSTS_PER_PAGE = 15
 
 # DevOps-трюк: прячем HTML-маркеры от автоформаттеров VS Code
 MARKER_START = "<" + "!-- START ARTICLES --" + ">"
 MARKER_END = "<" + "!-- END ARTICLES --" + ">"
 # --------------------
+
+def load_seo_cache() -> dict:
+    if os.path.exists(SEO_CACHE_FILE):
+        try:
+            with open(SEO_CACHE_FILE, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception as e:
+            print(f"Предупреждение: ошибка чтения seo_cache.json: {e}")
+    return {}
+
+def save_seo_cache(cache: dict) -> None:
+    try:
+        with open(SEO_CACHE_FILE, "w", encoding="utf-8") as f:
+            json.dump(cache, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        print(f"Предупреждение: ошибка сохранения seo_cache.json: {e}")
+
+def get_seo_for_post(post_id: str, title: str, text: str, cache: dict) -> dict:
+    if post_id in cache:
+        return cache[post_id]
+
+    if not GEMINI_API_KEY:
+        return {}
+
+    prompt = f"""Ты — профессиональный SEO-редактор и психолог для сайта частнопрактикующего психотерапевта Натальи Баландиной (метод ЛОРП).
+Автор часто формулирует свои мысли метафорично или академическим языком.
+
+Заголовок статьи: {title}
+Текст статьи:
+{text[:3500]}
+
+Твоя задача — извлечь практические смыслы для поисковых систем (Яндекс, Google) и читателя:
+1. "meta_description": привлекательное, емкое описание (140-160 символов, без кавычек) с высокочастотными поисковыми фразами, понятными обычному человеку (как ищут в Яндексе).
+2. "key_takeaway": ключевая мысль статьи простыми словами (1-2 емких предложения), объясняющая жизненную суть текста для читателя.
+3. "keywords": список из 5-8 популярных поисковых запросов и терминов, релевантных теме (например: ["выгорание на работе", "хроническая тревога", "как перестать все контролировать", "психотерапия отношений"]).
+4. "tags": список из 3-5 хэштегов темы на русском языке (например: ["#выгорание", "#тревожность", "#сверхконтроль", "#психология"]).
+
+Верни СТРОГО чистый JSON:
+{{
+  "meta_description": "...",
+  "key_takeaway": "...",
+  "keywords": ["...", "..."],
+  "tags": ["#...", "#..."]
+}}"""
+
+    payload = {
+        "contents": [{
+            "parts": [{"text": prompt}]
+        }],
+        "generationConfig": {
+            "responseMimeType": "application/json",
+            "temperature": 0.2
+        }
+    }
+
+    models = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]
+    for model in models:
+        api_url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={GEMINI_API_KEY}"
+        try:
+            resp = requests.post(api_url, json=payload, timeout=25)
+            if resp.status_code == 200:
+                result = resp.json()
+                text_content = result['candidates'][0]['content']['parts'][0]['text']
+                seo_data = json.loads(text_content)
+                if isinstance(seo_data, dict) and 'keywords' in seo_data:
+                    cache[post_id] = seo_data
+                    save_seo_cache(cache)
+                    print(f"  [AI SEO] Статья {post_id} успешно оптимизирована через {model}")
+                    return seo_data
+            else:
+                print(f"  [AI SEO] Gemini API ({model}) статус {resp.status_code}")
+        except Exception as e:
+            print(f"  [AI SEO] Ошибка вызова Gemini ({model}): {e}")
+
+    return {}
+
+def build_seo_html_components(seo_data: dict, default_excerpt: str):
+    meta_desc = seo_data.get('meta_description') if seo_data else None
+    if not meta_desc or len(meta_desc.strip()) < 20:
+        meta_desc = default_excerpt
+
+    keywords = seo_data.get('keywords', ["психотерапия", "психолог онлайн", "ЛОРП-практик"]) if seo_data else ["психотерапия", "психолог онлайн", "ЛОРП-практик"]
+    if not isinstance(keywords, list) or not keywords:
+        keywords = ["психотерапия", "психолог онлайн", "ЛОРП-практик"]
+    keywords_json = json.dumps(keywords, ensure_ascii=False)
+
+    takeaway = seo_data.get('key_takeaway', '').strip() if seo_data else ''
+    if takeaway:
+        safe_takeaway = html.escape(takeaway)
+        summary_block = f'''
+        <div class="article-summary">
+            <span class="article-summary__tag">Ключевая мысль</span>
+            <p>{safe_takeaway}</p>
+        </div>'''
+    else:
+        summary_block = ''
+
+    tags = seo_data.get('tags', []) if seo_data else []
+    if tags and isinstance(tags, list):
+        tags_spans = "".join(f'<span class="article-tag">{html.escape(t.strip())}</span>' for t in tags if t.strip())
+        tags_block = f'''
+        <div class="article-tags">
+            <span class="article-tags__label">Темы:</span>
+            {tags_spans}
+        </div>'''
+    else:
+        tags_block = ''
+
+    return meta_desc, keywords_json, summary_block, tags_block
+
+def enrich_existing_post_html(post_path: str, seo_data: dict) -> bool:
+    if not seo_data:
+        return False
+    try:
+        with open(post_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+    except Exception:
+        return False
+
+    if '<div class="article-tags">' in content:
+        return False
+
+    soup = BeautifulSoup(content, 'html.parser')
+    h1 = soup.find('h1', class_='article-title')
+    article_content = soup.find('div', class_='article-content')
+    if not h1 or not article_content:
+        return False
+
+    meta_desc, keywords_json, summary_block, tags_block = build_seo_html_components(seo_data, "")
+
+    if summary_block and not soup.find('div', class_='article-summary'):
+        summary_soup = BeautifulSoup(summary_block, 'html.parser')
+        h1.insert_after(summary_soup)
+
+    if tags_block and not soup.find('div', class_='article-tags'):
+        tags_soup = BeautifulSoup(tags_block, 'html.parser')
+        article_content.insert_after(tags_soup)
+
+    if meta_desc and len(meta_desc.strip()) > 20:
+        safe_desc = html.escape(meta_desc, quote=True)
+        for meta in soup.find_all('meta', attrs={'name': 'description'}):
+            meta['content'] = safe_desc
+        for meta in soup.find_all('meta', attrs={'property': 'og:description'}):
+            meta['content'] = safe_desc
+        for meta in soup.find_all('meta', attrs={'name': 'twitter:description'}):
+            meta['content'] = safe_desc
+
+    for script in soup.find_all('script', type='application/ld+json'):
+        try:
+            data = json.loads(script.string)
+            if data.get('@type') == 'Article':
+                data['keywords'] = seo_data.get('keywords', [])
+                if meta_desc:
+                    data['description'] = meta_desc
+                script.string = '\n' + json.dumps(data, ensure_ascii=False, indent=2) + '\n    '
+        except Exception:
+            pass
+
+    try:
+        with open(post_path, 'w', encoding='utf-8') as f:
+            f.write(str(soup))
+        return True
+    except Exception as e:
+        print(f"Ошибка записи {post_path}: {e}")
+        return False
 
 def is_valid_image_url(url: str | None) -> bool:
     if not url or url.strip() in ('{{IMAGE}}', 'None', '', 'null'):
@@ -272,6 +440,12 @@ def main() -> None:
     existing_posts = set(glob.glob(os.path.join(BASE_DIR, 'post-*.html')))
     new_posts_count = 0
     all_cards = []
+    seo_cache = load_seo_cache()
+
+    if GEMINI_API_KEY:
+        print(f"AI SEO: Модуль Gemini активен. Загружено {len(seo_cache)} записей из кэша.")
+    else:
+        print("AI SEO: GEMINI_API_KEY не обнаружен, используется стандартный режим.")
     
     for msg in messages:
         text_div = msg.find('div', class_='tgme_widget_message_text')
@@ -322,23 +496,33 @@ def main() -> None:
         article_filename = f"post-{post_id}.html"
         article_path = os.path.join(BASE_DIR, article_filename)
         
+        raw_text = strip_hashtags(text_div.get_text(separator=' '))
+        excerpt = raw_text[:140].strip() + ("..." if len(raw_text) > 140 else "")
+
         if article_path in existing_posts:
-            pass
+            # Если статья уже создана ранее, но еще не обогащена в кэше
+            if GEMINI_API_KEY and post_id not in seo_cache and len(raw_text) > 40:
+                seo_data = get_seo_for_post(post_id, title, raw_text, seo_cache)
+                if seo_data:
+                    enrich_existing_post_html(article_path, seo_data)
         else:
             content_html = strip_hashtags(str(text_div))
-            raw_text = strip_hashtags(text_div.get_text(separator=' '))
-            excerpt = raw_text[:140].strip() + ("..." if len(raw_text) > 140 else "")
-            
+            seo_data = get_seo_for_post(post_id, title, raw_text, seo_cache)
+            meta_desc, keywords_json, summary_block, tags_block = build_seo_html_components(seo_data, excerpt)
+
             safe_title_attr = html.escape(title, quote=True)
-            safe_desc_attr = html.escape(excerpt, quote=True)
+            safe_desc_attr = html.escape(meta_desc, quote=True)
             safe_title_json = json.dumps(title, ensure_ascii=False)[1:-1]
-            safe_desc_json = json.dumps(excerpt, ensure_ascii=False)[1:-1]
+            safe_desc_json = json.dumps(meta_desc, ensure_ascii=False)[1:-1]
 
             article_html = article_template.replace('{{TITLE}}', title)\
                                            .replace('{{DATE}}', post_date)\
                                            .replace('{{DATE_ISO}}', post_date_iso)\
                                            .replace('{{POST_ID}}', post_id)\
-                                           .replace('{{META_DESC}}', excerpt)\
+                                           .replace('{{META_DESC}}', meta_desc)\
+                                           .replace('{{KEYWORDS_JSON}}', keywords_json)\
+                                           .replace('{{SUMMARY_BLOCK}}', summary_block)\
+                                           .replace('{{TAGS_BLOCK}}', tags_block)\
                                            .replace('{{CONTENT}}', content_html)
 
             # Валидация JSON-LD и Open Graph при наличии кавычек в заголовке/описании
@@ -346,7 +530,7 @@ def main() -> None:
             article_html = re.sub(r'("description":\s*)"(.*?)"(,\s*\n)', rf'\1"{safe_desc_json}"\3', article_html)
             article_html = re.sub(r'("name":\s*)"(.*?)"(,\s*\n\s*"item":\s*"https://balandinatherapy\.ru/post-)', rf'\1"{safe_title_json}"\3', article_html)
             article_html = article_html.replace(f'content="{title} | Наталья Баландина"', f'content="{safe_title_attr} | Наталья Баландина"')
-            article_html = article_html.replace(f'content="{excerpt}"', f'content="{safe_desc_attr}"')
+            article_html = article_html.replace(f'content="{meta_desc}"', f'content="{safe_desc_attr}"')
             
             if image_url:
                 article_html = article_html.replace('{{IMAGE}}', image_url)
@@ -357,11 +541,15 @@ def main() -> None:
                 f.write(article_html)
             new_posts_count += 1
             
+        card_desc = excerpt
+        if post_id in seo_cache and seo_cache[post_id].get('meta_description'):
+            card_desc = seo_cache[post_id]['meta_description']
+
         image_block = '<div class="article-card__image article-card__image--placeholder"></div>'
         if image_url:
             image_block = f'\n                <div class="article-card__image" role="img" aria-label="Иллюстрация к статье: {title}" style="background-image: url(\'{image_url}\')"></div>'
             
-        card_html = f"""\n            <a href="{article_filename}" class="article-card">{image_block}\n                <div class="article-card__content">\n                    <div class="article-card__date">{post_date}</div>\n                    <h2 class="article-card__title">{title}</h2>\n                    <p class="article-card__excerpt">...</p>\n                    <div class="article-card__readmore">Читать статью →</div>\n                </div>\n            </a>"""
+        card_html = f"""\n            <a href="{article_filename}" class="article-card">{image_block}\n                <div class="article-card__content">\n                    <div class="article-card__date">{post_date}</div>\n                    <h2 class="article-card__title">{title}</h2>\n                    <p class="article-card__excerpt">{card_desc}</p>\n                    <div class="article-card__readmore">Читать статью →</div>\n                </div>\n            </a>"""
         all_cards.append((post_date, article_filename, card_html))
         
     current_files = {c[1] for c in all_cards}
@@ -390,6 +578,13 @@ def main() -> None:
             h1 = soup_post.find('h1', class_='article-title')
             title = h1.get_text(strip=True) if h1 else "Без названия"
             excerpt = extract_excerpt_from_html(post_html)
+
+            # Если для архивной статьи есть кэш AI SEO — используем умное описание
+            match_post_id = re.search(r'post-(\w+)\.html', basename)
+            if match_post_id:
+                p_id = match_post_id.group(1)
+                if p_id in seo_cache and seo_cache[p_id].get('meta_description'):
+                    excerpt = seo_cache[p_id]['meta_description']
             
             if not excerpt:
                 excerpt = "..."
@@ -445,6 +640,37 @@ def main() -> None:
         except Exception as e:
             print(f"  Ошибка при добавлении рекомендаций в {filename}: {e}")
     # ----------------------------------------------
+
+    # --- AI SEO: Фоновое постепенное обогащение архивных постов (до 5 за запуск) ---
+    if GEMINI_API_KEY:
+        archive_enriched = 0
+        for post_file in sorted(existing_posts, reverse=True):
+            if archive_enriched >= 5:
+                break
+            basename = os.path.basename(post_file)
+            match_post_id = re.search(r'post-(\w+)\.html', basename)
+            if not match_post_id:
+                continue
+            p_id = match_post_id.group(1)
+            if p_id not in seo_cache:
+                try:
+                    with open(post_file, 'r', encoding='utf-8') as f:
+                        old_html = f.read()
+                    soup_old = BeautifulSoup(old_html, 'html.parser')
+                    h1_tag = soup_old.find('h1', class_='article-title')
+                    old_title = h1_tag.get_text(strip=True) if h1_tag else "Без названия"
+                    content_div = soup_old.find('div', class_='article-content')
+                    old_text = content_div.get_text(separator=' ', strip=True) if content_div else ""
+                    if len(old_text) > 40:
+                        print(f"  [AI SEO] Обогащение архивной статьи {basename}...")
+                        seo_data = get_seo_for_post(p_id, old_title, old_text, seo_cache)
+                        if seo_data:
+                            enrich_existing_post_html(post_file, seo_data)
+                            archive_enriched += 1
+                            time.sleep(2)
+                except Exception as err:
+                    print(f"  [AI SEO] Ошибка обработки {basename}: {err}")
+    # -----------------------------------------------------
         
     all_post_files = [c[1] for c in all_cards]
     generate_sitemap(all_post_files, total_pages)
