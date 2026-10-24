@@ -190,7 +190,7 @@ def build_seo_html_components(seo_data: dict, default_excerpt: str):
 
     tags = seo_data.get('tags', []) if seo_data else []
     if tags and isinstance(tags, list):
-        tags_spans = "".join(f'<span class="article-tag">{html.escape(t.strip())}</span>' for t in tags if t.strip())
+        tags_spans = " ".join(f'<span class="article-tag">{html.escape(t.strip())}</span>' for t in tags if t.strip())
         tags_block = f'''
         <div class="article-tags">
             <span class="article-tags__label">Темы:</span>
