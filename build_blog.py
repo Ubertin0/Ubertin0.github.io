@@ -15,7 +15,7 @@ CHANNEL_URL = "https://t.me/s/balandinatherapy"
 TEMPLATE_FILE = os.path.join(BASE_DIR, "article-template.html")
 BLOG_FILE = os.path.join(BASE_DIR, "blog.html")
 SEO_CACHE_FILE = os.path.join(BASE_DIR, "seo_cache.json")
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "").strip()
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "").strip().strip('"').strip("'")
 POSTS_PER_PAGE = 15
 
 # DevOps-трюк: прячем HTML-маркеры от автоформаттеров VS Code
@@ -38,6 +38,58 @@ def save_seo_cache(cache: dict) -> None:
             json.dump(cache, f, ensure_ascii=False, indent=2)
     except Exception as e:
         print(f"Предупреждение: ошибка сохранения seo_cache.json: {e}")
+
+_DISCOVERED_MODELS = None
+
+def get_gemini_models_list() -> list:
+    global _DISCOVERED_MODELS
+    if _DISCOVERED_MODELS is not None:
+        return _DISCOVERED_MODELS
+
+    if not GEMINI_API_KEY:
+        _DISCOVERED_MODELS = []
+        return []
+
+    print(f"  [AI SEO] Инициализация ключа GEMINI_API_KEY (длина: {len(GEMINI_API_KEY)}, префикс: {GEMINI_API_KEY[:4]}...)")
+
+    # 1. Попытка динамически запросить список поддерживаемых моделей у Google API
+    endpoints = [
+        f"https://generativelanguage.googleapis.com/v1beta/models?key={GEMINI_API_KEY}",
+        f"https://generativelanguage.googleapis.com/v1/models?key={GEMINI_API_KEY}"
+    ]
+    for url in endpoints:
+        try:
+            resp = requests.get(
+                url,
+                headers={"x-goog-api-key": GEMINI_API_KEY, "Content-Type": "application/json"},
+                timeout=15
+            )
+            if resp.status_code == 200:
+                data = resp.json()
+                found = []
+                for item in data.get('models', []):
+                    methods = item.get('supportedGenerationMethods', [])
+                    if 'generateContent' in methods:
+                        m_name = item.get('name', '').replace('models/', '')
+                        if m_name:
+                            found.append(m_name)
+                if found:
+                    print(f"  [AI SEO] Доступные модели Gemini для вашего ключа: {found}")
+                    preferred = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-flash-latest", "gemini-pro"]
+                    ordered = [m for m in preferred if m in found]
+                    ordered += [m for m in found if "flash" in m.lower() and m not in ordered]
+                    ordered += [m for m in found if m not in ordered]
+                    _DISCOVERED_MODELS = ordered
+                    return _DISCOVERED_MODELS
+            else:
+                err_snippet = resp.text.strip().replace("\n", " ")[:250]
+                api_name = "v1beta" if "v1beta" in url else "v1"
+                print(f"  [AI SEO] Проверка моделей ({api_name}) вернула статус {resp.status_code}: {err_snippet}")
+        except Exception as e:
+            print(f"  [AI SEO] Ошибка проверки моделей: {e}")
+
+    _DISCOVERED_MODELS = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-flash-latest"]
+    return _DISCOVERED_MODELS
 
 def get_seo_for_post(post_id: str, title: str, text: str, cache: dict) -> dict:
     if post_id in cache:
@@ -77,24 +129,34 @@ def get_seo_for_post(post_id: str, title: str, text: str, cache: dict) -> dict:
         }
     }
 
-    models = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]
+    models = get_gemini_models_list()
+    if not models:
+        models = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-flash-latest"]
+
     for model in models:
-        api_url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={GEMINI_API_KEY}"
-        try:
-            resp = requests.post(api_url, json=payload, timeout=25)
-            if resp.status_code == 200:
-                result = resp.json()
-                text_content = result['candidates'][0]['content']['parts'][0]['text']
-                seo_data = json.loads(text_content)
-                if isinstance(seo_data, dict) and 'keywords' in seo_data:
-                    cache[post_id] = seo_data
-                    save_seo_cache(cache)
-                    print(f"  [AI SEO] Статья {post_id} успешно оптимизирована через {model}")
-                    return seo_data
-            else:
-                print(f"  [AI SEO] Gemini API ({model}) статус {resp.status_code}")
-        except Exception as e:
-            print(f"  [AI SEO] Ошибка вызова Gemini ({model}): {e}")
+        for api_ver in ["v1beta", "v1"]:
+            api_url = f"https://generativelanguage.googleapis.com/{api_ver}/models/{model}:generateContent?key={GEMINI_API_KEY}"
+            try:
+                resp = requests.post(
+                    api_url,
+                    json=payload,
+                    headers={"x-goog-api-key": GEMINI_API_KEY, "Content-Type": "application/json"},
+                    timeout=25
+                )
+                if resp.status_code == 200:
+                    result = resp.json()
+                    text_content = result['candidates'][0]['content']['parts'][0]['text']
+                    seo_data = json.loads(text_content)
+                    if isinstance(seo_data, dict) and 'keywords' in seo_data:
+                        cache[post_id] = seo_data
+                        save_seo_cache(cache)
+                        print(f"  [AI SEO] Статья {post_id} успешно оптимизирована через {model} ({api_ver})")
+                        return seo_data
+                else:
+                    err_msg = resp.text.strip().replace("\n", " ")[:250]
+                    print(f"  [AI SEO] Gemini API ({model}, {api_ver}) статус {resp.status_code}: {err_msg}")
+            except Exception as e:
+                print(f"  [AI SEO] Ошибка вызова Gemini ({model}, {api_ver}): {e}")
 
     return {}
 
@@ -644,8 +706,11 @@ def main() -> None:
     # --- AI SEO: Фоновое постепенное обогащение архивных постов (до 5 за запуск) ---
     if GEMINI_API_KEY:
         archive_enriched = 0
+        consecutive_failures = 0
         for post_file in sorted(existing_posts, reverse=True):
-            if archive_enriched >= 5:
+            if archive_enriched >= 5 or consecutive_failures >= 3:
+                if consecutive_failures >= 3:
+                    print("  [AI SEO] Приостановка обогащения архива: 3 неудачных запроса подряд. Проверьте ключ или настройки API.")
                 break
             basename = os.path.basename(post_file)
             match_post_id = re.search(r'post-(\w+)\.html', basename)
@@ -667,9 +732,13 @@ def main() -> None:
                         if seo_data:
                             enrich_existing_post_html(post_file, seo_data)
                             archive_enriched += 1
+                            consecutive_failures = 0
                             time.sleep(2)
+                        else:
+                            consecutive_failures += 1
                 except Exception as err:
                     print(f"  [AI SEO] Ошибка обработки {basename}: {err}")
+                    consecutive_failures += 1
     # -----------------------------------------------------
         
     all_post_files = [c[1] for c in all_cards]
