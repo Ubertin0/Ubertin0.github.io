@@ -781,15 +781,15 @@
 
                             <div class="form__group">
                                 <label class="form__label" for="name">Ваше имя</label>
-                                <input type="text" id="name" name="Имя" class="form__input" placeholder="Как к вам обращаться" required>
+                                <input type="text" id="name" name="Имя" class="form__input" placeholder="Как к вам обращаться" required maxlength="100">
                             </div>
                             <div class="form__group">
                                 <label class="form__label" for="contact">Телефон или email</label>
-                                <input type="text" id="contact" name="Контакты" class="form__input" placeholder="+7 (___) ___-__-__ или email" required>
+                                <input type="text" id="contact" name="Контакты" class="form__input" placeholder="+7 (___) ___-__-__ или email" required maxlength="100">
                             </div>
                             <div class="form__group">
                                 <label class="form__label" for="message">Коротко о запросе (необязательно)</label>
-                                <textarea id="message" name="Сообщение" class="form__textarea" placeholder="Кратко опишите, с чем хотели бы поработать"></textarea>
+                                <textarea id="message" name="Сообщение" class="form__textarea" placeholder="Кратко опишите, с чем хотели бы поработать" maxlength="1500"></textarea>
                             </div>
 
                             <!-- Чекбокс согласия 152-ФЗ обязателен и не предзаполнен -->
@@ -911,12 +911,30 @@
                 return;
             }
 
+            // Клиентский троттлинг: защита от частых повторных отправок (лимит 1 отправка в 60 сек)
+            const lastSubmitTime = parseInt(localStorage.getItem('form_last_submit_time') || '0', 10);
+            const now = Date.now();
+            const cooldown = 60 * 1000;
+            if (now - lastSubmitTime < cooldown) {
+                const remainingSec = Math.ceil((cooldown - (now - lastSubmitTime)) / 1000);
+                let errorBanner = document.getElementById("formThrottleMessage");
+                if (!errorBanner) {
+                    errorBanner = document.createElement("div");
+                    errorBanner.id = "formThrottleMessage";
+                    errorBanner.style.cssText = "color: #c93b2b; font-size: 0.9rem; margin-top: 1rem; text-align: center;";
+                    form.appendChild(errorBanner);
+                }
+                errorBanner.textContent = `Заявка уже отправлена. Подождите ${remainingSec} сек. перед повторной отправкой.`;
+                return;
+            }
+
             const btn = form.querySelector('button[type="submit"]');
             const originalText = btn.textContent;
 
             btn.textContent = "Отправка...";
             btn.style.opacity = "0.7";
             btn.style.pointerEvents = "none";
+            btn.disabled = true;
 
             try {
                 const response = await fetch(form.action, {
@@ -928,6 +946,7 @@
                 });
 
                 if (response.ok) {
+                    localStorage.setItem('form_last_submit_time', Date.now().toString());
                     form.style.display = "none";
                     const successBlock = document.getElementById("formSuccessMessage");
                     if (successBlock) successBlock.style.display = "block";
@@ -948,12 +967,14 @@
                     btn.style.background = "#d9534f";
                     btn.style.opacity = "1";
                     btn.style.pointerEvents = "all";
+                    btn.disabled = false;
                 }
             } catch (error) {
                 btn.textContent = "Ошибка сети";
                 btn.style.background = "#d9534f";
                 btn.style.opacity = "1";
                 btn.style.pointerEvents = "all";
+                btn.disabled = false;
             }
         }
         // Modal Logic for Privacy Policy
