@@ -313,9 +313,17 @@ def clean_text_div(text_div) -> None:
         src = img.get('src', '')
         if 'emoji' in img.get('class', []) or '/emoji/' in src:
             img.decompose()
+    for a in text_div.find_all('a'):
+        href = a.get('href', '')
+        # Удаляем относительные ссылки поиска/хэштегов (?q=...) и пустые ссылки
+        if href.startswith('?') or not a.get_text(strip=True):
+            a.decompose()
 
 def strip_hashtags(text: str) -> str:
-    return re.sub(r'#\w+', '', text)
+    text = re.sub(r'<a\s+[^>]*href=["\']\?[^"\']*["\'][^>]*>[\s\S]*?</a>', '', text, flags=re.IGNORECASE)
+    text = re.sub(r'#\w+', '', text)
+    text = re.sub(r'(?:<br\s*/?>\s*)+$', '', text.rstrip(), flags=re.IGNORECASE)
+    return text
 
 def generate_sitemap(posts: list[str], total_pages: int) -> None:
     from datetime import datetime
